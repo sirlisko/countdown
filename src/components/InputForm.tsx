@@ -59,10 +59,14 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
   });
   const { toast } = useToast();
 
-  useEffect(() => {
-    const subscription = form.watch(() => setLink(undefined));
-    return () => subscription.unsubscribe();
-  }, [form]);
+  useEffect(
+    () =>
+      form.subscribe({
+        formState: { values: true },
+        callback: () => setLink(undefined),
+      }),
+    [form],
+  );
 
   function onSubmit(data: CountdownType) {
     const qs = createQueryString({
