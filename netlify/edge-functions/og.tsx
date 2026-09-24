@@ -35,117 +35,115 @@ export default async (request: Request) => {
   const headline = truncate(countdown?.message ?? "How much time left?");
 
   return new ImageResponse(
-    (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        background: BG,
+        color: FG,
+        fontFamily: "Space Grotesk",
+      }}
+    >
       <div
         style={{
-          width: "100%",
-          height: "100%",
+          height: 88,
           display: "flex",
-          flexDirection: "column",
-          background: BG,
-          color: FG,
-          fontFamily: "Space Grotesk",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "0 48px",
+          borderBottom: `4px solid ${FG}`,
+          fontFamily: "JetBrains Mono",
+          fontSize: 24,
+          letterSpacing: 4,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div
+            style={{
+              width: 22,
+              height: 22,
+              background: signal,
+              border: `4px solid ${FG}`,
+            }}
+          />
+          COUNTDOWN
+        </div>
+        {countdown && (
+          <div
+            style={{
+              display: "flex",
+              background: signal,
+              color: BG,
+              padding: "6px 14px",
+            }}
+          >
+            {isPast ? "T-PLUS" : "T-MINUS"}
+          </div>
+        )}
+      </div>
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          alignItems: "center",
+          padding: "0 48px",
         }}
       >
         <div
           style={{
-            height: 88,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "0 48px",
-            borderBottom: `4px solid ${FG}`,
-            fontFamily: "JetBrains Mono",
-            fontSize: 24,
-            letterSpacing: 4,
+            fontSize: sizeFor(headline),
+            fontWeight: 700,
+            lineHeight: 0.9,
+            letterSpacing: "-0.04em",
+            textTransform: "uppercase",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <div
-              style={{
-                width: 22,
-                height: 22,
-                background: signal,
-                border: `4px solid ${FG}`,
-              }}
-            />
-            COUNTDOWN
-          </div>
-          {countdown && (
-            <div
-              style={{
-                display: "flex",
-                background: signal,
-                color: BG,
-                padding: "6px 14px",
-              }}
-            >
-              {isPast ? "T-PLUS" : "T-MINUS"}
-            </div>
-          )}
+          {headline}
+        </div>
+      </div>
+      <div
+        style={{
+          height: 112,
+          display: "flex",
+          alignItems: "stretch",
+          borderTop: `4px solid ${FG}`,
+          fontFamily: "JetBrains Mono",
+          fontSize: 32,
+          letterSpacing: 3,
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            padding: "0 32px",
+            background: FG,
+            color: BG,
+          }}
+        >
+          T-0
         </div>
         <div
           style={{
             flex: 1,
             display: "flex",
             alignItems: "center",
-            padding: "0 48px",
+            padding: "0 32px",
           }}
         >
-          <div
-            style={{
-              fontSize: sizeFor(headline),
-              fontWeight: 700,
-              lineHeight: 0.9,
-              letterSpacing: "-0.04em",
-              textTransform: "uppercase",
-            }}
-          >
-            {headline}
-          </div>
+          {countdown ? formatTarget(countdown) : "COUNTDOWN.SIRLISKO.COM"}
         </div>
         <div
           style={{
-            height: 112,
-            display: "flex",
-            alignItems: "stretch",
-            borderTop: `4px solid ${FG}`,
-            fontFamily: "JetBrains Mono",
-            fontSize: 32,
-            letterSpacing: 3,
+            width: 112,
+            background: signal,
+            borderLeft: `4px solid ${FG}`,
           }}
-        >
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              padding: "0 32px",
-              background: FG,
-              color: BG,
-            }}
-          >
-            T-0
-          </div>
-          <div
-            style={{
-              flex: 1,
-              display: "flex",
-              alignItems: "center",
-              padding: "0 32px",
-            }}
-          >
-            {countdown ? formatTarget(countdown) : "COUNTDOWN.SIRLISKO.COM"}
-          </div>
-          <div
-            style={{
-              width: 112,
-              background: signal,
-              borderLeft: `4px solid ${FG}`,
-            }}
-          />
-        </div>
+        />
       </div>
-    ),
+    </div>,
     {
       width: 1200,
       height: 630,
