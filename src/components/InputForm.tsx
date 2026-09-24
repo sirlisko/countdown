@@ -18,7 +18,7 @@ import { Label } from "./ui/label";
 import { CopyIcon, ExternalLinkIcon, Share1Icon } from "@radix-ui/react-icons";
 import { createQueryString } from "@/utils/queryString";
 import { getBrowserTimeZone } from "@/utils/timezone";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Countdown } from "@/types";
 import type { Countdown as CountdownType } from "@/types";
 import { DialogClose } from "./ui/dialog";
@@ -41,7 +41,7 @@ const filters = [
 const canShare = typeof navigator !== "undefined" && "share" in navigator;
 
 const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
-  const [link, setLink] = useState<string | undefined>("");
+  const [link, setLink] = useState<string>();
 
   const form = useForm<CountdownType>({
     mode: "onTouched",
@@ -57,21 +57,21 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
     },
   });
   const { toast } = useToast();
-  const { isValid } = form.formState;
+
+  useEffect(() => {
+    const subscription = form.watch(() => setLink(undefined));
+    return () => subscription.unsubscribe();
+  }, [form]);
 
   function onSubmit(data: CountdownType) {
-    if (isValid && data.date) {
-      const qs = createQueryString({
-        ...data,
-        // Editing keeps the original start so the bar doesn't reset
-        created: data.created ?? new Date().toISOString(),
-      });
-      setLink(
-        `${window.location.origin}/${data.obfuscate ? btoa(qs) : `?${qs}`}`,
-      );
-    } else {
-      setLink(undefined);
-    }
+    const qs = createQueryString({
+      ...data,
+      // Editing keeps the original start so the bar doesn't reset
+      created: data.created ?? new Date().toISOString(),
+    });
+    setLink(
+      `${window.location.origin}/${data.obfuscate ? btoa(qs) : `?${qs}`}`,
+    );
   }
 
   function onCopy() {
@@ -94,7 +94,7 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
 
   return (
     <Form {...form}>
-      <form onChange={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
           name="message"
@@ -236,61 +236,56 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
             </FormItem>
           )}
         />
-        {link && (
-          <>
-            <div className="flex items-center space-x-2 mt-5">
-              <div className="grid flex-1 gap-2">
-                <Label htmlFor="link" className="sr-only">
-                  Link
-                </Label>
-                <Input id="link" value={link} readOnly />
+        <FormField
+          control={form.control}
+          name="obfuscate"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <div className="space-y-2">
+                <FormLabel>Hide details from the URL</FormLabel>
+                <FormDescription>
+                  Scrambles the link so the message isn't readable at a glance.
+                  Not encryption: anyone can decode it.
+                </FormDescription>
               </div>
-              {canShare && (
-                <Button
-                  type="button"
-                  size="sm"
-                  className="px-3"
-                  onClick={onShare}
-                >
-                  <span className="sr-only">Share</span>
-                  <Share1Icon className="h-4 w-4" />
-                </Button>
-              )}
-              <DialogClose asChild>
-                <Button
-                  type="button"
-                  size="sm"
-                  className="px-3"
-                  onClick={onCopy}
-                >
-                  <span className="sr-only">Copy</span>
-                  <CopyIcon className="h-4 w-4" />
-                </Button>
-              </DialogClose>
-              <Button size="sm" className="px-3" asChild>
-                <a href={link} target="_blank" rel="noopener noreferrer">
-                  <ExternalLinkIcon className="h-4 w-4" />
-                </a>
+            </FormItem>
+          )}
+        />
+        {link ? (
+          <div className="flex items-center gap-2">
+            <Label htmlFor="link" className="sr-only">
+              Link
+            </Label>
+            <Input id="link" value={link} readOnly className="flex-1" />
+            {canShare && (
+              <Button type="button" size="icon" onClick={onShare}>
+                <span className="sr-only">Share</span>
+                <Share1Icon className="size-4" />
               </Button>
-            </div>
-            <FormField
-              control={form.control}
-              name="obfuscate"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md ">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Obfuscate the link</FormLabel>
-                  </div>
-                </FormItem>
-              )}
-            />
-          </>
+            )}
+            <DialogClose asChild>
+              <Button type="button" size="icon" onClick={onCopy}>
+                <span className="sr-only">Copy</span>
+                <CopyIcon className="size-4" />
+              </Button>
+            </DialogClose>
+            <Button size="icon" asChild>
+              <a href={link} target="_blank" rel="noopener noreferrer">
+                <span className="sr-only">Open</span>
+                <ExternalLinkIcon className="size-4" />
+              </a>
+            </Button>
+          </div>
+        ) : (
+          <Button type="submit" className="h-11 w-full">
+            Generate link
+          </Button>
         )}
       </form>
     </Form>
