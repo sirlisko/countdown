@@ -2,6 +2,7 @@ import {
   isValidDate,
   normaliseDateOrder,
   getTimeDifferences,
+  formatCompact,
   localDateAsUTC,
   nextYearly,
 } from "./date";
@@ -117,5 +118,16 @@ describe("nextYearly", () => {
     const then = new Date("2020-07-01T10:00:00.000Z"); // 12:00 in Rome
     const { next } = nextYearly(then, new Date(2026, 8, 24), "Europe/Rome");
     expect(next).toEqual(new Date("2027-07-01T10:00:00.000Z"));
+  });
+});
+
+describe("formatCompact", () => {
+  it("should only show the units that matter", () => {
+    const from = new Date(2026, 0, 1);
+    expect(formatCompact(new Date(2026, 0, 1, 1, 2, 3), from)).toBe("01:02:03");
+    expect(formatCompact(new Date(2026, 3, 11, 0, 0, 9), from)).toBe(
+      "100d 00:00:09",
+    );
+    expect(formatCompact(new Date(2028, 0, 1), from)).toBe("2y 0d 00:00:00");
   });
 });

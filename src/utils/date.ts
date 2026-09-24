@@ -91,3 +91,15 @@ export const nextYearly = (then: Date, now: Date, timeZone?: string) => {
   while (next <= now) next = add(++years);
   return { next, previous: add(years - 1) };
 };
+
+export const formatCompact = (to: Date, from: Date) => {
+  const { years, days, hours, minutes, seconds } = getTimeDifferences(to, from);
+  const pad = (value: number) => value.toString().padStart(2, "0");
+  return [
+    years > 0 && `${years}y`,
+    (years > 0 || days > 0) && `${days}d`,
+    `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`,
+  ]
+    .filter(Boolean)
+    .join(" ");
+};

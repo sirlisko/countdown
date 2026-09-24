@@ -3,7 +3,12 @@ import { format } from "date-fns";
 
 import { useFullscreen } from "@/hooks/use-fullscreen";
 import { useNow } from "@/hooks/use-now";
-import { isValidDate, nextYearly, normaliseDateOrder } from "@/utils/date";
+import {
+  formatCompact,
+  isValidDate,
+  nextYearly,
+  normaliseDateOrder,
+} from "@/utils/date";
 import { readCountdown } from "@/utils/location";
 import { wallClockIn } from "@/utils/timezone";
 import type { Countdown as CountdownType } from "@/types";
@@ -42,9 +47,16 @@ const CountdownPage = () => {
 
   useEffect(() => {
     document.documentElement.dataset.phase = isPast ? "past" : "future";
-    const prefix = message && !isSample ? `${message} - ` : "";
-    document.title = `${prefix}${isPast ? "How long ago?" : "How much time left?"} - Countdown`;
-  }, [isPast, message, isSample]);
+  }, [isPast]);
+
+  const { from, to, isInverted } = normaliseDateOrder(now, target);
+
+  useEffect(() => {
+    const label = message && !isSample ? message : "Countdown";
+    document.title = isValid
+      ? `T${isInverted ? "+" : "-"}${formatCompact(to, from)} · ${label}`
+      : "Countdown";
+  }, [isValid, isInverted, from, to, message, isSample]);
 
   const defaultValues = useMemo<CountdownType | undefined>(
     () =>
@@ -69,7 +81,6 @@ const CountdownPage = () => {
     [countdown, isValid, message, then, created, timeZone, yearly, filters],
   );
 
-  const { from, to, isInverted } = normaliseDateOrder(now, target);
   const progressStart =
     created && repeat && repeat.previous > created ? repeat.previous : created;
 
