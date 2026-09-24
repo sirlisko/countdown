@@ -1,34 +1,86 @@
-import { getTimeDifferences } from "../../utils/date";
+import { getTimeDifferences } from "@/utils/date";
+import { cn } from "@/lib/utils";
 
-import FlipNumbers from "./FlipNumbers";
 import CountdownFilters from "./CountdownFilters";
+import TickNumber from "./TickNumber";
 
-import { CountdownFromString } from "../../types";
+import { CountdownFromString } from "@/types";
 
 const Countdown = ({ from, to, filters, isInverted }: CountdownFromString) => {
   const { years, days, hours, minutes, seconds } = getTimeDifferences(to, from);
+
+  const dateUnits = [
+    ...(years > 0 ? [{ label: "Years", value: years }] : []),
+    ...(years > 0 || days > 0 ? [{ label: "Days", value: days }] : []),
+  ];
+  const timeUnits = [
+    { label: "Hours", value: hours },
+    { label: "Minutes", value: minutes },
+    { label: "Seconds", value: seconds },
+  ];
+
+  const spoken = [...dateUnits, ...timeUnits.slice(0, 2)]
+    .map(({ label, value }) => `${value} ${label.toLowerCase()}`)
+    .join(", ");
+
   return (
-    <div style={{ margin: filters.length ? "10vh auto" : "20vh auto" }}>
-      <div className="text-[6vw] flex">
-        {years > 0 && (
-          <>
-            <FlipNumbers number={years} isInverted={isInverted} />y
-          </>
-        )}
-        {days > 0 && (
-          <>
-            <FlipNumbers number={days} isInverted={isInverted} />d
-          </>
-        )}
-        <FlipNumbers number={hours} isInverted={isInverted} /> :
-        <FlipNumbers number={minutes} isInverted={isInverted} /> :
-        <FlipNumbers number={seconds} isInverted={isInverted} />
+    <section className="flex flex-col">
+      <div
+        role="timer"
+        aria-label={`${spoken} ${isInverted ? "ago" : "left"}`}
+        className="grid grid-cols-6 gap-[2px] border-2 border-foreground bg-foreground sm:auto-cols-fr sm:grid-flow-col sm:grid-cols-none"
+      >
+        {dateUnits.map(({ label, value }) => (
+          <Unit
+            key={label}
+            label={label}
+            value={value}
+            isInverted={isInverted}
+            className={dateUnits.length === 1 ? "col-span-6" : "col-span-3"}
+          />
+        ))}
+        {timeUnits.map(({ label, value }) => (
+          <Unit
+            key={label}
+            label={label}
+            value={value}
+            isInverted={isInverted}
+            className={cn(
+              "col-span-2",
+              label === "Seconds" && "bg-signal text-signal-foreground",
+            )}
+          />
+        ))}
       </div>
       {filters.length > 0 && (
         <CountdownFilters from={from} to={to} filters={filters} />
       )}
-    </div>
+    </section>
   );
 };
+
+const Unit = ({
+  label,
+  value,
+  isInverted,
+  className,
+}: {
+  label: string;
+  value: number;
+  isInverted?: boolean;
+  className?: string;
+}) => (
+  <div
+    className={cn(
+      "flex flex-col justify-between gap-4 bg-background p-2 [container-type:inline-size] sm:col-span-1 sm:p-4",
+      className,
+    )}
+  >
+    <span className="font-mono text-[10px] uppercase tracking-widest sm:text-xs">
+      {label}
+    </span>
+    <TickNumber value={value} isInverted={isInverted} />
+  </div>
+);
 
 export default Countdown;

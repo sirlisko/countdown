@@ -1,98 +1,99 @@
-import React, { useState, useEffect } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { format } from "date-fns";
-import { getQueryString } from "../utils/queryString";
-import { isValidDate, normaliseDateOrder } from "../utils/date";
-import DialogNew from "./DialogNew";
 
-import dates from "../dates";
+import { useFullscreen } from "@/hooks/use-fullscreen";
+import { useNow } from "@/hooks/use-now";
+import { isValidDate, normaliseDateOrder } from "@/utils/date";
+import { readCountdown } from "@/utils/location";
 import type { Countdown as CountdownType } from "@/types";
 import Countdown from "./Counter/Countdown";
-import DynammicTitle from "./Counter/DynamicTitle";
+import Footer from "./Footer";
+import Header from "./Header";
+import Headline from "./Headline";
+import ZeroFlash from "./ZeroFlash";
 
-const CountdownPage: React.FC = () => {
-  const [now, setNow] = useState(new Date());
-  const [then, setThen] = useState<Date>();
-  const [message, setMessage] = useState<string>();
-  const [filters, setFilters] = useState<string[]>([]);
-  const [obfuscate, setObfuscate] = useState(false);
+const CountdownPage = () => {
+  const [{ then, message, filters, obfuscate, isSample }] = useState(() =>
+    readCountdown(window.location),
+  );
+  const now = useNow();
+  const { isFullscreen, toggle: toggleFullscreen } = useFullscreen();
+  const [showZero, setShowZero] = useState(false);
+  const dismissZero = useCallback(() => setShowZero(false), []);
+
+  const isValid = isValidDate(then);
+  const isPast = now.getTime() >= then.getTime();
+
+  const wasPast = useRef(isPast);
+  useEffect(() => {
+    if (isValid && isPast && !wasPast.current) setShowZero(true);
+    wasPast.current = isPast;
+  }, [isValid, isPast]);
 
   useEffect(() => {
-    const interval = setInterval(() => setNow(new Date()), 1000);
+    document.documentElement.dataset.phase = isPast ? "past" : "future";
+    const prefix = message && !isSample ? `${message} - ` : "";
+    document.title = `${prefix}${isPast ? "How long ago?" : "How much time left?"} - Countdown`;
+  }, [isPast, message, isSample]);
 
-    const path = window.location.pathname.split("/").pop();
-    const searchParams = new URLSearchParams(window.location.search);
-
-    let decoded: string;
-    try {
-      decoded = path ? atob(path) : searchParams.toString();
-    } catch {
-      setThen(new Date(NaN));
-      return () => clearInterval(interval);
-    }
-    const qs = getQueryString(decoded);
-    setObfuscate(!!path);
-
-    if (qs && qs.then) {
-      const { message, then, filters } = qs;
-      setThen(then);
-      setMessage(message || "\u00A0");
-      if (filters) setFilters(filters);
-
-      document.title =
-        new Date().getTime() < then.getTime()
-          ? `${message ? message + " - " : ""}How much time left? - Countdown`
-          : `${message ? message + " - " : ""}How long ago? - Countdown`;
-    } else {
-      const { date, text, filters } =
-        dates[Math.floor(Math.random() * dates.length)];
-      setThen(date);
-      setMessage(text);
-      if (filters) setFilters(filters);
-    }
-
-    return () => clearInterval(interval);
-  }, []);
-
-  if (!then) {
-    return null;
-  }
+  const defaultValues = useMemo<CountdownType | undefined>(
+    () =>
+      isValid
+        ? {
+            message,
+            date: format(then, "yyyy-MM-dd"),
+            time: format(then, "HH:mm"),
+            filters,
+            obfuscate,
+          }
+        : undefined,
+    [isValid, message, then, filters, obfuscate],
+  );
 
   const { from, to, isInverted } = normaliseDateOrder(now, then);
 
-  if (!isValidDate(then)) {
-    return (
-      <div className="flex h-screen">
-        <div className="m-auto text-center text-2xl p-3">
-          Oops! Something went wrong with your date
-          <div className="text-center mt-20">
-            <DialogNew />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  const defaultValues: CountdownType = {
-    message,
-    date: format(then, "yyyy-MM-dd"),
-    time: format(then, "HH:mm"),
-    filters,
-    obfuscate,
-  };
-
   return (
-    <>
-      <DynammicTitle message={message} />
-      <Countdown
-        from={from}
-        to={to}
-        filters={filters}
-        isInverted={isInverted}
-      />
-      <div className="text-center">
-        <DialogNew defaultValues={defaultValues} />
-      </div>
-    </>
+    <div className="flex min-h-dvh flex-col">
+      {!isFullscreen && (
+        <Header
+          isPast={isValid ? isPast : undefined}
+          defaultValues={defaultValues}
+          onFullscreen={toggleFullscreen}
+        />
+      )}
+      <main className="flex flex-1 flex-col justify-between gap-12 px-4 py-8 sm:px-8 sm:py-12">
+        {isValid ? (
+          <>
+            <Headline message={message} then={then} />
+            <Countdown
+              from={from}
+              to={to}
+              filters={filters}
+              isInverted={isInverted}
+            />
+          </>
+        ) : (
+          <section className="flex flex-col gap-6">
+            <p className="font-mono text-xs uppercase tracking-widest">
+              <span className="bg-destructive px-1.5 py-0.5 text-destructive-foreground">
+                Err
+              </span>{" "}
+              This link doesn't hold a valid date
+            </p>
+            <h1 className="text-[clamp(3rem,12vw,12rem)] font-bold uppercase leading-[0.8] tracking-tighter">
+              Invalid
+              <br />
+              date.
+            </h1>
+            <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+              Hit “New” to make your own.
+            </p>
+          </section>
+        )}
+      </main>
+      {!isFullscreen && <Footer />}
+      {showZero && <ZeroFlash message={message} onDismiss={dismissZero} />}
+    </div>
   );
 };
 

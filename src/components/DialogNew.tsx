@@ -1,4 +1,5 @@
 import { memo, useState } from "react";
+import { Pencil1Icon, PlusIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,33 +12,53 @@ import {
 import InputForm from "./InputForm";
 import { Countdown } from "@/types";
 
-const DialogNew = memo(({ defaultValues }: { defaultValues?: Countdown }) => {
-  const [isEdit, setIsEdit] = useState(false);
-  return (
-    <Dialog>
-      <DialogTrigger asChild className="block mx-auto">
-        <Button variant="outline" onClick={() => setIsEdit(false)}>
-          Create your countdown
-        </Button>
-      </DialogTrigger>
-      {defaultValues && (
-        <DialogTrigger asChild className="block mx-auto mt-3">
-          <Button variant="link" onClick={() => setIsEdit(true)}>
-            Edit countdown
+const DialogNew = memo(
+  ({
+    defaultValues,
+    triggerClassName,
+  }: {
+    defaultValues?: Countdown;
+    triggerClassName?: string;
+  }) => {
+    const [isEdit, setIsEdit] = useState(false);
+    return (
+      <Dialog>
+        {defaultValues && (
+          <DialogTrigger asChild>
+            <Button
+              variant="ghost"
+              className={triggerClassName}
+              onClick={() => setIsEdit(true)}
+            >
+              <Pencil1Icon className="size-4" />
+              <span className="sr-only sm:not-sr-only">Edit</span>
+            </Button>
+          </DialogTrigger>
+        )}
+        <DialogTrigger asChild>
+          <Button
+            variant="ghost"
+            className={triggerClassName}
+            onClick={() => setIsEdit(false)}
+          >
+            <PlusIcon className="size-4" />
+            <span className="sr-only sm:not-sr-only">New</span>
           </Button>
         </DialogTrigger>
-      )}
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Create your countdown</DialogTitle>
-          <DialogDescription hidden>
-            Make your personalised countdown
-          </DialogDescription>
-        </DialogHeader>
-        <InputForm defaultValues={isEdit ? defaultValues : undefined} />
-      </DialogContent>
-    </Dialog>
-  );
-});
+        <DialogContent className="max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] overflow-y-auto sm:max-w-md">
+          <DialogHeader className="text-left">
+            <DialogTitle>
+              {isEdit ? "Edit countdown" : "New countdown"}
+            </DialogTitle>
+            <DialogDescription hidden>
+              Make your personalised countdown
+            </DialogDescription>
+          </DialogHeader>
+          <InputForm defaultValues={isEdit ? defaultValues : undefined} />
+        </DialogContent>
+      </Dialog>
+    );
+  },
+);
 
 export default DialogNew;

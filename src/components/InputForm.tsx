@@ -143,11 +143,9 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
           render={() => (
             <FormItem>
               <div className="mb-4">
-                <FormLabel className="text-base">
-                  Add extra countdowns
-                </FormLabel>
+                <FormLabel>Extra totals</FormLabel>
                 <FormDescription>
-                  Optional, they will be displayed below the main countdown.
+                  Optional, shown below the main countdown.
                 </FormDescription>
               </div>
               <div className="flex space-x-4">
@@ -176,9 +174,7 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
                               }
                             />
                           </FormControl>
-                          <FormLabel className="text-sm font-normal">
-                            {item.label}
-                          </FormLabel>
+                          <FormLabel>{item.label}</FormLabel>
                         </FormItem>
                       );
                     }}
