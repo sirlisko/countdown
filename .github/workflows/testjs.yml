@@ -3,26 +3,67 @@ name: Test CI
 on: [push]
 
 jobs:
-  build:
+  checks:
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
         with:
           version: 9
-      - name: Use Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version-file: ".nvmrc"
           cache: "pnpm"
-      - name: Install dependencies
-        run: pnpm install
-        env:
-          CI: true
+      - run: pnpm install --frozen-lockfile
       - name: Linter
         run: pnpm lint
       - name: Type checking
         run: pnpm type-check
+      - name: Build
+        run: pnpm build
+
+  unit:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # Date handling depends on the system zone: cover UTC, a DST zone
+        # behind UTC and a half-hour offset
+        tz: [UTC, America/Los_Angeles, Asia/Kolkata]
+    name: unit (${{ matrix.tz }})
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
       - name: Unit tests
-        run: pnpm test -- --run
+        run: pnpm vitest run
+        env:
+          TZ: ${{ matrix.tz }}
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "pnpm"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm exec playwright install --with-deps chromium
+      - name: End-to-end tests
+        run: pnpm test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-traces
+          path: test-results
+          retention-days: 7
