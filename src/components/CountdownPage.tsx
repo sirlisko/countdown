@@ -81,6 +81,20 @@ const CountdownPage = () => {
     [countdown, isValid, message, then, created, timeZone, yearly, filters],
   );
 
+  const calendarEvent = useMemo(
+    () =>
+      isValid
+        ? {
+            title: (!isSample && message) || "Countdown",
+            start: then,
+            url: window.location.href,
+            timeZone,
+            yearly,
+          }
+        : undefined,
+    [isValid, yearly, then, isSample, message, timeZone],
+  );
+
   const progressStart =
     created && repeat && repeat.previous > created ? repeat.previous : created;
 
@@ -90,6 +104,7 @@ const CountdownPage = () => {
         <Header
           isPast={isValid ? isPast : undefined}
           defaultValues={defaultValues}
+          calendarEvent={isPast && !yearly ? undefined : calendarEvent}
           onFullscreen={toggleFullscreen}
         />
       )}

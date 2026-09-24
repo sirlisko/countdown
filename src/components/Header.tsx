@@ -3,6 +3,8 @@ import { EnterFullScreenIcon } from "@radix-ui/react-icons";
 import { Button } from "@/components/ui/button";
 import { isFullscreenSupported } from "@/hooks/use-fullscreen";
 import { Countdown } from "@/types";
+import type { CalendarEvent } from "@/utils/calendar";
+import CalendarMenu from "./CalendarMenu";
 import DialogNew from "./DialogNew";
 import { ModeToggle } from "./mode-toggler";
 
@@ -11,10 +13,12 @@ const cell = "h-full border-l-2 border-foreground px-3 sm:px-4";
 const Header = ({
   isPast,
   defaultValues,
+  calendarEvent,
   onFullscreen,
 }: {
   isPast?: boolean;
   defaultValues?: Countdown;
+  calendarEvent?: CalendarEvent;
   onFullscreen: () => void;
 }) => (
   <header className="flex h-14 items-stretch border-b-2 border-foreground font-mono text-xs uppercase tracking-widest">
@@ -35,6 +39,7 @@ const Header = ({
     )}
     <nav className="ml-auto flex items-stretch">
       <DialogNew defaultValues={defaultValues} triggerClassName={cell} />
+      {calendarEvent && <CalendarMenu event={calendarEvent} className={cell} />}
       {isFullscreenSupported && (
         <Button
           variant="ghost"
