@@ -26,5 +26,5 @@
     },
     "types": ["vitest/globals"]
   },
-  "include": ["src"]
+  "include": ["src", "e2e", "playwright.config.ts", "vitest.setup.ts"]
 }

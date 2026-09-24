@@ -24,3 +24,7 @@ yarn-error.log*
 
 # netlify
 .netlify
+
+# playwright
+/test-results
+/playwright-report
