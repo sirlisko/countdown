@@ -48,7 +48,7 @@ const Headline = ({
       <h1
         className={cn(
           sizeFor(message),
-          "hyphens-auto break-words text-balance font-bold uppercase leading-[0.85] tracking-tighter",
+          "hyphens-auto wrap-break-word text-balance font-bold uppercase leading-[0.85] tracking-tighter",
         )}
       >
         {message}

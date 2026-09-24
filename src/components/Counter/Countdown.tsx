@@ -80,7 +80,7 @@ const Unit = ({
 }) => (
   <div
     className={cn(
-      "flex flex-col justify-between gap-4 bg-background p-2 [container-type:inline-size] sm:col-span-1 sm:p-4",
+      "flex flex-col justify-between gap-4 bg-background p-2 @container sm:col-span-1 sm:p-4",
       className,
     )}
   >
