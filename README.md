@@ -23,7 +23,7 @@ pnpm start
 - CI using [Github Actions](https://github.com/features/actions)
 - Styling [Tailwind CSS](https://tailwindcss.com/)
 - UI Components [Shadcn/ui](https://ui.shadcn.com)
-- Hosted on [Netlify](https://netlify.com)
+- Hosted on [Netlify](https://netlify.com), with Edge Functions rendering link-preview (Open Graph) images
 
 It's possible to [check out the v1 of the project](https://github.com/sirLisko/countdown/tree/v0.1), running Create React App, Jest, Emotion and Babel Macros.
 
