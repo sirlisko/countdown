@@ -24,7 +24,7 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "types": ["vitest/globals"]
+    "types": ["vitest/globals", "node"]
   },
   "include": ["src", "e2e", "playwright.config.ts", "vitest.setup.ts"]
 }
