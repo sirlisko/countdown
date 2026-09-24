@@ -3,7 +3,7 @@ import { format } from "date-fns";
 
 import { useFullscreen } from "@/hooks/use-fullscreen";
 import { useNow } from "@/hooks/use-now";
-import { isValidDate, normaliseDateOrder } from "@/utils/date";
+import { isValidDate, normaliseDateOrder, toFloatingISO } from "@/utils/date";
 import { readCountdown } from "@/utils/location";
 import type { Countdown as CountdownType } from "@/types";
 import Countdown from "./Counter/Countdown";
@@ -13,8 +13,8 @@ import Headline from "./Headline";
 import ZeroFlash from "./ZeroFlash";
 
 const CountdownPage = () => {
-  const [{ then, message, filters, obfuscate, isSample }] = useState(() =>
-    readCountdown(window.location),
+  const [{ then, created, message, filters, obfuscate, isSample }] = useState(
+    () => readCountdown(window.location),
   );
   const now = useNow();
   const { isFullscreen, toggle: toggleFullscreen } = useFullscreen();
@@ -45,9 +45,11 @@ const CountdownPage = () => {
             time: format(then, "HH:mm"),
             filters,
             obfuscate,
+            progress: !!created,
+            created: created && toFloatingISO(created),
           }
         : undefined,
-    [isValid, message, then, filters, obfuscate],
+    [isValid, message, then, created, filters, obfuscate],
   );
 
   const { from, to, isInverted } = normaliseDateOrder(now, then);
@@ -70,6 +72,11 @@ const CountdownPage = () => {
               to={to}
               filters={filters}
               isInverted={isInverted}
+              progress={
+                created && created < then
+                  ? { start: created, end: then, now }
+                  : undefined
+              }
             />
           </>
         ) : (

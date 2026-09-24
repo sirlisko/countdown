@@ -2,11 +2,18 @@ import { getTimeDifferences } from "@/utils/date";
 import { cn } from "@/lib/utils";
 
 import CountdownFilters from "./CountdownFilters";
+import ProgressBar from "./ProgressBar";
 import TickNumber from "./TickNumber";
 
 import { CountdownFromString } from "@/types";
 
-const Countdown = ({ from, to, filters, isInverted }: CountdownFromString) => {
+const Countdown = ({
+  from,
+  to,
+  filters,
+  isInverted,
+  progress,
+}: CountdownFromString) => {
   const { years, days, hours, minutes, seconds } = getTimeDifferences(to, from);
 
   const dateUnits = [
@@ -25,6 +32,7 @@ const Countdown = ({ from, to, filters, isInverted }: CountdownFromString) => {
 
   return (
     <section className="flex flex-col">
+      {progress && <ProgressBar {...progress} />}
       <div
         role="timer"
         aria-label={`${spoken} ${isInverted ? "ago" : "left"}`}

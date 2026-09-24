@@ -9,7 +9,15 @@ describe("queryString util", () => {
       filters: ["h"],
       message: "to the next year",
       then: new Date("2020-01-11T00:00:00.000Z"),
+      created: false,
     });
+  });
+
+  it("should parse the creation date", () => {
+    const { created } = getQueryString(
+      "t=2020-01-11T00:00:00.000Z&c=2019-06-01T12:30:00.000Z",
+    );
+    expect(created && [created.getDate(), created.getHours()]).toEqual([1, 12]);
   });
 });
 
@@ -36,5 +44,20 @@ describe("createQueryString util", () => {
     };
     const createdString = createQueryString(countdown);
     expect(createdString).toEqual("m=asd&t=2000-12-20T17%3A30%3A00.000Z");
+  });
+
+  it("should add the creation date only when progress is enabled", () => {
+    const countdown = {
+      date: "2000-12-20",
+      filters: [],
+      time: "17:30",
+      created: "2000-01-01T09:00:00.000Z",
+    };
+    expect(createQueryString(countdown)).toEqual(
+      "t=2000-12-20T17%3A30%3A00.000Z",
+    );
+    expect(createQueryString({ ...countdown, progress: true })).toEqual(
+      "c=2000-01-01T09%3A00%3A00.000Z&t=2000-12-20T17%3A30%3A00.000Z",
+    );
   });
 });

@@ -1,8 +1,10 @@
 import dates from "@/dates";
+import { isValidDate } from "./date";
 import { getQueryString } from "./queryString";
 
 export interface CountdownState {
   then: Date;
+  created?: Date;
   message?: string;
   filters: string[];
   obfuscate: boolean;
@@ -27,10 +29,11 @@ export const readCountdown = ({
     };
   }
 
-  const { then, message, filters } = getQueryString(decoded);
+  const { then, created, message, filters } = getQueryString(decoded);
   if (then) {
     return {
       then,
+      created: created && isValidDate(created) ? created : undefined,
       message: message || undefined,
       filters: filters || [],
       obfuscate: !!path,

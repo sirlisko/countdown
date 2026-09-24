@@ -17,6 +17,7 @@ import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
 import { CopyIcon, ExternalLinkIcon, Share1Icon } from "@radix-ui/react-icons";
 import { createQueryString } from "@/utils/queryString";
+import { toFloatingISO } from "@/utils/date";
 import { useState } from "react";
 import { Countdown } from "@/types";
 import type { Countdown as CountdownType } from "@/types";
@@ -50,6 +51,7 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
       filters: [],
       time: "00:00",
       obfuscate: false,
+      progress: false,
       date: "",
     },
   });
@@ -58,7 +60,11 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
 
   function onSubmit(data: CountdownType) {
     if (isValid && data.date) {
-      const qs = createQueryString(data as Countdown);
+      const qs = createQueryString({
+        ...data,
+        // Editing keeps the original start so the bar doesn't reset
+        created: data.created ?? toFloatingISO(new Date()),
+      });
       setLink(
         `${window.location.origin}/${data.obfuscate ? btoa(qs) : `?${qs}`}`,
       );
@@ -182,6 +188,26 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
                 ))}
               </div>
               <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="progress"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <div className="space-y-2">
+                <FormLabel>Progress bar</FormLabel>
+                <FormDescription>
+                  Fills up from the moment you share it until the target.
+                </FormDescription>
+              </div>
             </FormItem>
           )}
         />

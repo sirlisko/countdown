@@ -6,6 +6,8 @@ export const Countdown = z.object({
   time: z.string(),
   filters: z.array(z.string()),
   obfuscate: z.boolean().optional(),
+  progress: z.boolean().optional(),
+  created: z.string().optional(),
 });
 
 export type Countdown = z.infer<typeof Countdown>;
@@ -15,4 +17,5 @@ export interface CountdownFromString {
   to: Date;
   filters: string[];
   isInverted?: boolean;
+  progress?: { start: Date; end: Date; now: Date };
 }

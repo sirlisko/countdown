@@ -1,4 +1,5 @@
 import {
+  format,
   isValid,
   differenceInYears,
   differenceInDays,
@@ -49,6 +50,10 @@ export const getTimeDifferences = (to: Date, from: Date) => {
     seconds,
   };
 };
+
+// Links store wall-clock times with a Z suffix; localDateAsUTC reverses this
+export const toFloatingISO = (date: Date) =>
+  format(date, "yyyy-MM-dd'T'HH:mm:ss.000'Z'");
 
 const getTimezoneOffset = (value: Date) => value.getTimezoneOffset() * 60000;
 

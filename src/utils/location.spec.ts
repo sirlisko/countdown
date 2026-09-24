@@ -23,6 +23,14 @@ describe("readCountdown", () => {
     expect(countdown).toMatchObject({ message: "launch", obfuscate: true });
   });
 
+  it("should ignore an invalid creation date", () => {
+    const countdown = readCountdown({
+      pathname: "/",
+      search: "?t=2030-01-01T10%3A00%3A00.000Z&c=nope",
+    });
+    expect(countdown.created).toBeUndefined();
+  });
+
   it("should return an invalid date when the path is not base64", () => {
     const countdown = readCountdown({ pathname: "/not-base64!", search: "" });
     expect(Number.isNaN(countdown.then.getTime())).toBe(true);
