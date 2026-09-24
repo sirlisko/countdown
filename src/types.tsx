@@ -10,6 +10,7 @@ export const Countdown = z.object({
   created: z.string().optional(),
   sameMoment: z.boolean().optional(),
   timeZone: z.string().optional(),
+  yearly: z.boolean().optional(),
 });
 
 export type Countdown = z.infer<typeof Countdown>;

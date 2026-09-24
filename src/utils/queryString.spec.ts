@@ -11,6 +11,7 @@ describe("queryString util", () => {
       message: "to the next year",
       then: new Date(2020, 0, 11),
       created: false,
+      yearly: false,
     });
   });
 
@@ -89,5 +90,16 @@ describe("createQueryString util", () => {
     expect(createQueryString({ ...countdown, progress: true })).toEqual(
       "c=2000-01-01T09%3A00%3A00.000Z&t=2000-12-20T17%3A30%3A00.000Z",
     );
+  });
+
+  it("should mark yearly countdowns", () => {
+    expect(
+      createQueryString({
+        date: "2000-05-20",
+        time: "09:00",
+        filters: [],
+        yearly: true,
+      }),
+    ).toEqual("r=y&t=2000-05-20T09%3A00%3A00.000Z");
   });
 });

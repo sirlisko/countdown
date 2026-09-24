@@ -6,6 +6,7 @@ export interface CountdownState {
   then: Date;
   created?: Date;
   timeZone?: string;
+  yearly: boolean;
   message?: string;
   filters: string[];
   obfuscate: boolean;
@@ -24,18 +25,21 @@ export const readCountdown = ({
   } catch {
     return {
       then: new Date(NaN),
+      yearly: false,
       filters: [],
       obfuscate: true,
       isSample: false,
     };
   }
 
-  const { then, created, timeZone, message, filters } = getQueryString(decoded);
+  const { then, created, timeZone, yearly, message, filters } =
+    getQueryString(decoded);
   if (then) {
     return {
       then,
       created: created && isValidDate(created) ? created : undefined,
       timeZone,
+      yearly,
       message: message || undefined,
       filters: filters || [],
       obfuscate: !!path,
@@ -47,6 +51,7 @@ export const readCountdown = ({
   return {
     then: sample.date,
     message: sample.text,
+    yearly: false,
     filters: sample.filters ?? [],
     obfuscate: false,
     isSample: true,

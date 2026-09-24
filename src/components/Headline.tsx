@@ -19,10 +19,12 @@ const Headline = ({
   message,
   then,
   timeZone,
+  yearly,
 }: {
   message?: string;
   then: Date;
   timeZone?: string;
+  yearly?: boolean;
 }) => (
   <section className="flex flex-col gap-4 sm:gap-6">
     <p className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[10px] uppercase tracking-widest sm:text-xs">
@@ -31,6 +33,11 @@ const Headline = ({
         {format(then, "EEE dd MMM yyyy")} <span aria-hidden>·</span>{" "}
         {format(then, "HH:mm")} {timeZone ? timeZoneName(then) : "local time"}
       </time>
+      {yearly && (
+        <span className="border border-foreground px-1.5 py-px">
+          Every year
+        </span>
+      )}
       {timeZone && timeZone !== getBrowserTimeZone() && (
         <span className="text-muted-foreground">
           ({wallClockIn(then, timeZone).time} in {city(timeZone)})

@@ -2,6 +2,7 @@ export interface SharedCountdown {
   message?: string;
   target: Date;
   timeZone?: string;
+  yearly: boolean;
 }
 
 const isValidTimeZone = (timeZone: string) => {
@@ -18,12 +19,19 @@ export const readSharedCountdown = (
 ): SharedCountdown | undefined => {
   const t = params.get("t");
   if (!t) return undefined;
-  const target = new Date(t);
+  let target = new Date(t);
   if (Number.isNaN(target.getTime())) return undefined;
+  const yearly = params.get("r") === "y";
+  // UTC year steps can be an hour off across DST, fine for a preview
+  while (yearly && target.getTime() <= Date.now()) {
+    target = new Date(target);
+    target.setUTCFullYear(target.getUTCFullYear() + 1);
+  }
   const z = params.get("z");
   return {
     message: params.get("m") || undefined,
     target,
+    yearly,
     timeZone: z ? (isValidTimeZone(z) ? z : "UTC") : undefined,
   };
 };

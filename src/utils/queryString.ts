@@ -10,7 +10,7 @@ import {
 // Links with `z` hold real UTC instants; links without it hold floating
 // wall-clock times that fire at that local time for each viewer
 export const getQueryString = (search: string) => {
-  const { t, m, f, c, z } = queryString.parse(search);
+  const { t, m, f, c, z, r } = queryString.parse(search);
   const isInstant = typeof z === "string";
   const parse = (value: string) =>
     isInstant ? new Date(value) : localDateAsUTC(value);
@@ -24,6 +24,7 @@ export const getQueryString = (search: string) => {
       : undefined,
     message: typeof m === "string" && m,
     filters: typeof f === "string" && f.split(","),
+    yearly: r === "y",
   };
 };
 
@@ -36,6 +37,7 @@ export const createQueryString = ({
   created,
   sameMoment,
   timeZone,
+  yearly,
 }: Countdown) => {
   const zone = sameMoment ? (timeZone ?? getBrowserTimeZone()) : undefined;
   return queryString.stringify(
@@ -52,6 +54,7 @@ export const createQueryString = ({
             ? created
             : toFloatingISO(new Date(created))
           : undefined,
+      r: yearly ? "y" : undefined,
     },
     { arrayFormat: "comma" },
   );

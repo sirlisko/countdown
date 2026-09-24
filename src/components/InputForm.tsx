@@ -53,6 +53,7 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
       obfuscate: false,
       progress: false,
       sameMoment: true,
+      yearly: false,
       date: "",
     },
   });
@@ -163,6 +164,27 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
                         form.getValues("timeZone") ?? getBrowserTimeZone()
                       ).replace(/_/g, " ")}.`
                     : "Hits zero at this local time wherever each viewer is, like New Year's Eve."}
+                </FormDescription>
+              </div>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="yearly"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <div className="space-y-2">
+                <FormLabel>Repeat every year</FormLabel>
+                <FormDescription>
+                  Rolls over to next year once it hits zero. Made for birthdays
+                  and anniversaries.
                 </FormDescription>
               </div>
             </FormItem>

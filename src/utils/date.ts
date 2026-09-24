@@ -1,4 +1,5 @@
 import {
+  addYears,
   format,
   isValid,
   differenceInYears,
@@ -11,6 +12,7 @@ import {
   subMinutes,
   subHours,
 } from "date-fns";
+import { addYearsInZone } from "./timezone";
 
 export const isValidDate = (date: Date): boolean => date && isValid(date);
 
@@ -75,4 +77,17 @@ export const localDateAsUTC = (value: Date | string) => {
     date.getUTCMilliseconds(),
   );
   return local;
+};
+
+/**
+ * The first yearly repeat of `then` after `now`, plus the one before it.
+ * Always offsets from the original date so 29 February comes back in leap years.
+ */
+export const nextYearly = (then: Date, now: Date, timeZone?: string) => {
+  const add = (years: number) =>
+    timeZone ? addYearsInZone(then, years, timeZone) : addYears(then, years);
+  let years = Math.max(0, now.getFullYear() - then.getFullYear() - 1);
+  let next = years ? add(years) : then;
+  while (next <= now) next = add(++years);
+  return { next, previous: add(years - 1) };
 };

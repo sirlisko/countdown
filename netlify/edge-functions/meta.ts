@@ -27,7 +27,7 @@ export default async (request: Request, context: Context) => {
     ? `${countdown.message} - Countdown`
     : "Countdown by sirlisko";
   const description = countdown
-    ? `T-0: ${formatTarget(countdown)}`
+    ? `${countdown.yearly ? "Every year. Next " : ""}T-0: ${formatTarget(countdown)}`
     : DEFAULT_DESCRIPTION;
   const image = new URL("/og", url.origin);
   if (countdown) image.search = url.search;

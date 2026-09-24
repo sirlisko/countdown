@@ -3,32 +3,42 @@ import { format } from "date-fns";
 
 import { useFullscreen } from "@/hooks/use-fullscreen";
 import { useNow } from "@/hooks/use-now";
-import { isValidDate, normaliseDateOrder } from "@/utils/date";
-import { wallClockIn } from "@/utils/timezone";
+import { isValidDate, nextYearly, normaliseDateOrder } from "@/utils/date";
 import { readCountdown } from "@/utils/location";
+import { wallClockIn } from "@/utils/timezone";
 import type { Countdown as CountdownType } from "@/types";
 import Countdown from "./Counter/Countdown";
 import Footer from "./Footer";
 import Header from "./Header";
 import Headline from "./Headline";
+import InvalidLink from "./InvalidLink";
 import ZeroFlash from "./ZeroFlash";
 
 const CountdownPage = () => {
-  const [{ then, created, timeZone, message, filters, obfuscate, isSample }] =
-    useState(() => readCountdown(window.location));
+  const [countdown] = useState(() => readCountdown(window.location));
+  const { then, created, timeZone, yearly, message, filters, isSample } =
+    countdown;
   const now = useNow();
   const { isFullscreen, toggle: toggleFullscreen } = useFullscreen();
   const [showZero, setShowZero] = useState(false);
   const dismissZero = useCallback(() => setShowZero(false), []);
 
   const isValid = isValidDate(then);
-  const isPast = now.getTime() >= then.getTime();
+  const repeat =
+    isValid && yearly ? nextYearly(then, now, timeZone) : undefined;
+  const target = repeat?.next ?? then;
+  const isPast = now.getTime() >= target.getTime();
 
-  const wasPast = useRef(isPast);
+  // Flash when the target seen on the previous tick has just been reached,
+  // which also catches yearly countdowns rolling over to next year
+  const previousTick = useRef({ now, target });
   useEffect(() => {
-    if (isValid && isPast && !wasPast.current) setShowZero(true);
-    wasPast.current = isPast;
-  }, [isValid, isPast]);
+    const previous = previousTick.current;
+    if (isValid && previous.target > previous.now && previous.target <= now) {
+      setShowZero(true);
+    }
+    previousTick.current = { now, target };
+  }, [isValid, now, target]);
 
   useEffect(() => {
     document.documentElement.dataset.phase = isPast ? "past" : "future";
@@ -48,17 +58,20 @@ const CountdownPage = () => {
                   time: format(then, "HH:mm"),
                 }),
             filters,
-            obfuscate,
+            obfuscate: countdown.obfuscate,
             progress: !!created,
             created: created?.toISOString(),
             sameMoment: !!timeZone,
             timeZone,
+            yearly,
           }
         : undefined,
-    [isValid, message, then, created, timeZone, filters, obfuscate],
+    [countdown, isValid, message, then, created, timeZone, yearly, filters],
   );
 
-  const { from, to, isInverted } = normaliseDateOrder(now, then);
+  const { from, to, isInverted } = normaliseDateOrder(now, target);
+  const progressStart =
+    created && repeat && repeat.previous > created ? repeat.previous : created;
 
   return (
     <div className="flex min-h-dvh flex-col">
@@ -72,36 +85,26 @@ const CountdownPage = () => {
       <main className="flex flex-1 flex-col justify-between gap-12 px-4 py-8 sm:px-8 sm:py-12">
         {isValid ? (
           <>
-            <Headline message={message} then={then} timeZone={timeZone} />
+            <Headline
+              message={message}
+              then={target}
+              timeZone={timeZone}
+              yearly={yearly}
+            />
             <Countdown
               from={from}
               to={to}
               filters={filters}
               isInverted={isInverted}
               progress={
-                created && created < then
-                  ? { start: created, end: then, now }
+                progressStart && progressStart < target
+                  ? { start: progressStart, end: target, now }
                   : undefined
               }
             />
           </>
         ) : (
-          <section className="flex flex-col gap-6">
-            <p className="font-mono text-xs uppercase tracking-widest">
-              <span className="bg-destructive px-1.5 py-0.5 text-destructive-foreground">
-                Err
-              </span>{" "}
-              This link doesn't hold a valid date
-            </p>
-            <h1 className="text-[clamp(3rem,12vw,12rem)] font-bold uppercase leading-[0.8] tracking-tighter">
-              Invalid
-              <br />
-              date.
-            </h1>
-            <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-              Hit “New” to make your own.
-            </p>
-          </section>
+          <InvalidLink />
         )}
       </main>
       {!isFullscreen && <Footer />}
