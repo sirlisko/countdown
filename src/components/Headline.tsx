@@ -1,5 +1,10 @@
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import {
+  getBrowserTimeZone,
+  timeZoneName,
+  wallClockIn,
+} from "@/utils/timezone";
 
 const sizeFor = (message: string) => {
   if (message.length <= 24) return "text-[clamp(3rem,9vw,10rem)]";
@@ -7,14 +12,30 @@ const sizeFor = (message: string) => {
   return "text-[clamp(1.75rem,4vw,4rem)]";
 };
 
-const Headline = ({ message, then }: { message?: string; then: Date }) => (
+const city = (timeZone: string) =>
+  timeZone.split("/").pop()!.replace(/_/g, " ");
+
+const Headline = ({
+  message,
+  then,
+  timeZone,
+}: {
+  message?: string;
+  then: Date;
+  timeZone?: string;
+}) => (
   <section className="flex flex-col gap-4 sm:gap-6">
     <p className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[10px] uppercase tracking-widest sm:text-xs">
       <span className="bg-foreground px-1.5 py-0.5 text-background">T-0</span>
       <time dateTime={then.toISOString()}>
         {format(then, "EEE dd MMM yyyy")} <span aria-hidden>·</span>{" "}
-        {format(then, "HH:mm")}
+        {format(then, "HH:mm")} {timeZone ? timeZoneName(then) : "local time"}
       </time>
+      {timeZone && timeZone !== getBrowserTimeZone() && (
+        <span className="text-muted-foreground">
+          ({wallClockIn(then, timeZone).time} in {city(timeZone)})
+        </span>
+      )}
     </p>
     {message && (
       <h1

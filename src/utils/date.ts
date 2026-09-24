@@ -55,15 +55,24 @@ export const getTimeDifferences = (to: Date, from: Date) => {
 export const toFloatingISO = (date: Date) =>
   format(date, "yyyy-MM-dd'T'HH:mm:ss.000'Z'");
 
-const getTimezoneOffset = (value: Date) => value.getTimezoneOffset() * 60000;
-
 /**
- * Converts a local date to a date object that represents the same moment in UTC.
- * @param {Date | string} value - The local date to convert to UTC.
- * @returns {Date} The equivalent UTC date.
+ * Reads the UTC fields of a floating link time as a local wall-clock time.
+ * Built from fields rather than shifted by getTimezoneOffset, which is rounded
+ * to minutes and drifts for historic dates whose offsets had seconds.
  */
 export const localDateAsUTC = (value: Date | string) => {
   const date = new Date(value);
-  const utcFromLocal = new Date(date.getTime() + getTimezoneOffset(date));
-  return utcFromLocal;
+  const local = new Date(0);
+  local.setFullYear(
+    date.getUTCFullYear(),
+    date.getUTCMonth(),
+    date.getUTCDate(),
+  );
+  local.setHours(
+    date.getUTCHours(),
+    date.getUTCMinutes(),
+    date.getUTCSeconds(),
+    date.getUTCMilliseconds(),
+  );
+  return local;
 };

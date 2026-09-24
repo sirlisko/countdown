@@ -134,9 +134,7 @@ export default async (request: Request) => {
               padding: "0 32px",
             }}
           >
-            {countdown
-              ? formatTarget(countdown.target)
-              : "COUNTDOWN.SIRLISKO.COM"}
+            {countdown ? formatTarget(countdown) : "COUNTDOWN.SIRLISKO.COM"}
           </div>
           <div
             style={{

@@ -3,7 +3,8 @@ import { format } from "date-fns";
 
 import { useFullscreen } from "@/hooks/use-fullscreen";
 import { useNow } from "@/hooks/use-now";
-import { isValidDate, normaliseDateOrder, toFloatingISO } from "@/utils/date";
+import { isValidDate, normaliseDateOrder } from "@/utils/date";
+import { wallClockIn } from "@/utils/timezone";
 import { readCountdown } from "@/utils/location";
 import type { Countdown as CountdownType } from "@/types";
 import Countdown from "./Counter/Countdown";
@@ -13,9 +14,8 @@ import Headline from "./Headline";
 import ZeroFlash from "./ZeroFlash";
 
 const CountdownPage = () => {
-  const [{ then, created, message, filters, obfuscate, isSample }] = useState(
-    () => readCountdown(window.location),
-  );
+  const [{ then, created, timeZone, message, filters, obfuscate, isSample }] =
+    useState(() => readCountdown(window.location));
   const now = useNow();
   const { isFullscreen, toggle: toggleFullscreen } = useFullscreen();
   const [showZero, setShowZero] = useState(false);
@@ -41,15 +41,21 @@ const CountdownPage = () => {
       isValid
         ? {
             message,
-            date: format(then, "yyyy-MM-dd"),
-            time: format(then, "HH:mm"),
+            ...(timeZone
+              ? wallClockIn(then, timeZone)
+              : {
+                  date: format(then, "yyyy-MM-dd"),
+                  time: format(then, "HH:mm"),
+                }),
             filters,
             obfuscate,
             progress: !!created,
-            created: created && toFloatingISO(created),
+            created: created?.toISOString(),
+            sameMoment: !!timeZone,
+            timeZone,
           }
         : undefined,
-    [isValid, message, then, created, filters, obfuscate],
+    [isValid, message, then, created, timeZone, filters, obfuscate],
   );
 
   const { from, to, isInverted } = normaliseDateOrder(now, then);
@@ -66,7 +72,7 @@ const CountdownPage = () => {
       <main className="flex flex-1 flex-col justify-between gap-12 px-4 py-8 sm:px-8 sm:py-12">
         {isValid ? (
           <>
-            <Headline message={message} then={then} />
+            <Headline message={message} then={then} timeZone={timeZone} />
             <Countdown
               from={from}
               to={to}

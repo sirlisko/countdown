@@ -5,6 +5,7 @@ import { getQueryString } from "./queryString";
 export interface CountdownState {
   then: Date;
   created?: Date;
+  timeZone?: string;
   message?: string;
   filters: string[];
   obfuscate: boolean;
@@ -29,11 +30,12 @@ export const readCountdown = ({
     };
   }
 
-  const { then, created, message, filters } = getQueryString(decoded);
+  const { then, created, timeZone, message, filters } = getQueryString(decoded);
   if (then) {
     return {
       then,
       created: created && isValidDate(created) ? created : undefined,
+      timeZone,
       message: message || undefined,
       filters: filters || [],
       obfuscate: !!path,

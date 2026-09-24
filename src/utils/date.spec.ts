@@ -63,11 +63,23 @@ describe("date util", () => {
 });
 
 describe("localDateAsUTC", () => {
-  it("should return a date object that represents the same moment in UTC", () => {
-    const localDate = new Date("2022-01-01T00:00:00");
-    const utcDate = localDateAsUTC(localDate);
+  const wallClock = (date: Date) => [
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+    date.getHours(),
+    date.getMinutes(),
+  ];
 
-    expect(utcDate.getTime()).toBe(localDate.getTime());
-    expect(utcDate.toISOString()).toContain("Z");
+  it("should read the UTC fields as a local wall-clock time", () => {
+    expect(wallClock(localDateAsUTC("2022-06-01T12:30:00.000Z"))).toEqual([
+      2022, 5, 1, 12, 30,
+    ]);
+  });
+
+  it("should not drift for historic dates", () => {
+    expect(wallClock(localDateAsUTC("1476-09-04T00:00:00.000Z"))).toEqual([
+      1476, 8, 4, 0, 0,
+    ]);
   });
 });

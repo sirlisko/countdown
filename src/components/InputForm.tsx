@@ -17,7 +17,7 @@ import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
 import { CopyIcon, ExternalLinkIcon, Share1Icon } from "@radix-ui/react-icons";
 import { createQueryString } from "@/utils/queryString";
-import { toFloatingISO } from "@/utils/date";
+import { getBrowserTimeZone } from "@/utils/timezone";
 import { useState } from "react";
 import { Countdown } from "@/types";
 import type { Countdown as CountdownType } from "@/types";
@@ -52,6 +52,7 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
       time: "00:00",
       obfuscate: false,
       progress: false,
+      sameMoment: true,
       date: "",
     },
   });
@@ -63,7 +64,7 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
       const qs = createQueryString({
         ...data,
         // Editing keeps the original start so the bar doesn't reset
-        created: data.created ?? toFloatingISO(new Date()),
+        created: data.created ?? new Date().toISOString(),
       });
       setLink(
         `${window.location.origin}/${data.obfuscate ? btoa(qs) : `?${qs}`}`,
@@ -143,6 +144,30 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
             )}
           />
         </div>
+        <FormField
+          control={form.control}
+          name="sameMoment"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <div className="space-y-2">
+                <FormLabel>Same moment everywhere</FormLabel>
+                <FormDescription>
+                  {field.value
+                    ? `Everyone hits zero together, at this time in ${(
+                        form.getValues("timeZone") ?? getBrowserTimeZone()
+                      ).replace(/_/g, " ")}.`
+                    : "Hits zero at this local time wherever each viewer is, like New Year's Eve."}
+                </FormDescription>
+              </div>
+            </FormItem>
+          )}
+        />
         <FormField
           control={form.control}
           name="filters"
