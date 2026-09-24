@@ -8,7 +8,7 @@ import { CountdownFromString } from "../../types";
 const Countdown = ({ from, to, filters, isInverted }: CountdownFromString) => {
   const { years, days, hours, minutes, seconds } = getTimeDifferences(to, from);
   return (
-    <div style={{ margin: filters ? "10vh auto" : "20vh auto" }}>
+    <div style={{ margin: filters.length ? "10vh auto" : "20vh auto" }}>
       <div className="text-[6vw] flex">
         {years > 0 && (
           <>
@@ -24,7 +24,9 @@ const Countdown = ({ from, to, filters, isInverted }: CountdownFromString) => {
         <FlipNumbers number={minutes} isInverted={isInverted} /> :
         <FlipNumbers number={seconds} isInverted={isInverted} />
       </div>
-      {filters && <CountdownFilters from={from} to={to} filters={filters} />}
+      {filters.length > 0 && (
+        <CountdownFilters from={from} to={to} filters={filters} />
+      )}
     </div>
   );
 };

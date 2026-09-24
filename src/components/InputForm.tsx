@@ -17,7 +17,7 @@ import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
 import { CopyIcon, ExternalLinkIcon, Share1Icon } from "@radix-ui/react-icons";
 import { createQueryString } from "@/utils/queryString";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Countdown } from "@/types";
 import type { Countdown as CountdownType } from "@/types";
 import { DialogClose } from "./ui/dialog";
@@ -37,9 +37,10 @@ const filters = [
   },
 ] as const;
 
+const canShare = typeof navigator !== "undefined" && "share" in navigator;
+
 const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
   const [link, setLink] = useState<string | undefined>("");
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
 
   const form = useForm<CountdownType>({
     mode: "onTouched",
@@ -54,15 +55,6 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
   });
   const { toast } = useToast();
   const { isValid } = form.formState;
-
-  useEffect(() => {
-    const checkTouchDevice = () => {
-      setIsTouchDevice(
-        "ontouchstart" in window || navigator.maxTouchPoints > 0,
-      );
-    };
-    checkTouchDevice();
-  }, []);
 
   function onSubmit(data: CountdownType) {
     if (isValid && data.date) {
@@ -85,10 +77,12 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
 
   function onShare() {
     if (!link) return;
-    navigator.share({
-      url: link,
-      title: `${form.getValues("message")} Countdown`,
-    });
+    navigator
+      .share({
+        url: link,
+        title: `${form.getValues("message")} Countdown`,
+      })
+      .catch(() => {});
   }
 
   return (
@@ -204,19 +198,28 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
                 </Label>
                 <Input id="link" value={link} readOnly />
               </div>
-              {isTouchDevice ? (
-                <Button size="sm" className="px-3" onClick={onShare}>
+              {canShare && (
+                <Button
+                  type="button"
+                  size="sm"
+                  className="px-3"
+                  onClick={onShare}
+                >
                   <span className="sr-only">Share</span>
                   <Share1Icon className="h-4 w-4" />
                 </Button>
-              ) : (
-                <DialogClose asChild>
-                  <Button size="sm" className="px-3" onClick={onCopy}>
-                    <span className="sr-only">Copy</span>
-                    <CopyIcon className="h-4 w-4" />
-                  </Button>
-                </DialogClose>
               )}
+              <DialogClose asChild>
+                <Button
+                  type="button"
+                  size="sm"
+                  className="px-3"
+                  onClick={onCopy}
+                >
+                  <span className="sr-only">Copy</span>
+                  <CopyIcon className="h-4 w-4" />
+                </Button>
+              </DialogClose>
               <Button size="sm" className="px-3" asChild>
                 <a href={link} target="_blank" rel="noopener noreferrer">
                   <ExternalLinkIcon className="h-4 w-4" />

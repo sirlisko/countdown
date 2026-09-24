@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { format } from "date-fns";
 import { getQueryString } from "../utils/queryString";
 import { isValidDate, normaliseDateOrder } from "../utils/date";
 import DialogNew from "./DialogNew";
@@ -21,9 +22,14 @@ const CountdownPage: React.FC = () => {
     const path = window.location.pathname.split("/").pop();
     const searchParams = new URLSearchParams(window.location.search);
 
-    const qs = path
-      ? getQueryString(atob(path))
-      : searchParams && getQueryString(searchParams.toString());
+    let decoded: string;
+    try {
+      decoded = path ? atob(path) : searchParams.toString();
+    } catch {
+      setThen(new Date(NaN));
+      return () => clearInterval(interval);
+    }
+    const qs = getQueryString(decoded);
     setObfuscate(!!path);
 
     if (qs && qs.then) {
@@ -68,8 +74,8 @@ const CountdownPage: React.FC = () => {
 
   const defaultValues: CountdownType = {
     message,
-    date: then.toISOString().split("T")[0],
-    time: then.toTimeString().split(" ")[0].substring(0, 5),
+    date: format(then, "yyyy-MM-dd"),
+    time: format(then, "HH:mm"),
     filters,
     obfuscate,
   };
