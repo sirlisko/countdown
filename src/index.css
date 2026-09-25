@@ -53,6 +53,11 @@
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
+
+  /* iOS Safari centres date/time values once appearance is reset */
+  ::-webkit-date-and-time-value {
+    text-align: left;
+  }
 }
 
 @utility grain {
