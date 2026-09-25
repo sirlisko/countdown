@@ -117,13 +117,13 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
             control={form.control}
             name="date"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="min-w-0">
                 <FormLabel>Date</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
                     type="date"
-                    className="flex flex-col justify-center"
+                    className="flex min-w-0 appearance-none flex-col justify-center"
                   />
                 </FormControl>
                 <FormMessage />
@@ -134,13 +134,13 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
             control={form.control}
             name="time"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="min-w-0">
                 <FormLabel>Time</FormLabel>
                 <FormControl>
                   <Input
                     {...field}
                     type="time"
-                    className="flex flex-col justify-center"
+                    className="flex min-w-0 appearance-none flex-col justify-center"
                   />
                 </FormControl>
                 <FormMessage />
