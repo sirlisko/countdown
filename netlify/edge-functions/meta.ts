@@ -4,7 +4,7 @@ import { formatTarget, readSharedCountdown } from "../lib/countdown.ts";
 const DEFAULT_DESCRIPTION =
   "Create customizable countdowns with ease. Track both future and past events with dynamic titles and flexible options.";
 
-const escape = (value: string) =>
+const escapeHtml = (value: string) =>
   value.replace(
     /[&<>"']/g,
     (char) =>
@@ -47,7 +47,7 @@ export default async (request: Request, context: Context) => {
   ]
     .map(
       ([key, content]) =>
-        `<meta ${key.startsWith("og:") ? "property" : "name"}="${key}" content="${escape(content)}" />`,
+        `<meta ${key.startsWith("og:") ? "property" : "name"}="${key}" content="${escapeHtml(content)}" />`,
     )
     .join("\n  ");
 

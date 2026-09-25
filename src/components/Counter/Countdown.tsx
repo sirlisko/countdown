@@ -1,11 +1,9 @@
-import { getTimeDifferences } from "@/utils/date";
 import { cn } from "@/lib/utils";
-
+import type { CountdownFromString } from "@/types";
+import { getTimeDifferences } from "@/utils/date";
 import CountdownFilters from "./CountdownFilters";
 import ProgressBar from "./ProgressBar";
 import TickNumber from "./TickNumber";
-
-import { CountdownFromString } from "@/types";
 
 const Countdown = ({
   from,
@@ -80,7 +78,7 @@ const Unit = ({
 }) => (
   <div
     className={cn(
-      "flex flex-col justify-between gap-4 bg-background p-2 [container-type:inline-size] sm:col-span-1 sm:p-4",
+      "flex flex-col justify-between gap-4 bg-background p-2 @container sm:col-span-1 sm:p-4",
       className,
     )}
   >

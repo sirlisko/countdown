@@ -1,3 +1,0 @@
-src/components/ui/**/*.tsx
-src/hooks/use-toast.ts
-src/lib/utils.ts

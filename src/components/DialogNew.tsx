@@ -1,5 +1,5 @@
-import { memo, useState } from "react";
 import { Pencil1Icon, PlusIcon } from "@radix-ui/react-icons";
+import { memo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -9,8 +9,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import type { Countdown } from "@/types";
 import InputForm from "./InputForm";
-import { Countdown } from "@/types";
 
 const DialogNew = memo(
   ({

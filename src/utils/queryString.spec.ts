@@ -1,5 +1,5 @@
-import { Countdown } from "@/types";
-import { getQueryString, createQueryString } from "./queryString";
+import type { Countdown } from "@/types";
+import { createQueryString, getQueryString } from "./queryString";
 
 describe("queryString util", () => {
   it("should return the date parsed", () => {

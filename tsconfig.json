@@ -20,11 +20,17 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
 
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
-    "types": ["vitest/globals"]
+    "types": ["vitest/globals", "node", "vite/client"]
   },
-  "include": ["src", "e2e", "playwright.config.ts", "vitest.setup.ts"]
+  "include": [
+    "src",
+    "e2e",
+    "playwright.config.ts",
+    "vitest.setup.ts",
+    "vite.config.ts",
+    "vitest.config.ts"
+  ]
 }

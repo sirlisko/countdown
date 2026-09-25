@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { CopyIcon, ExternalLinkIcon, Share1Icon } from "@radix-ui/react-icons";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-
-import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -13,15 +13,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "./ui/checkbox";
-import { Label } from "./ui/label";
-import { CopyIcon, ExternalLinkIcon, Share1Icon } from "@radix-ui/react-icons";
+import { useToast } from "@/hooks/use-toast";
+import type { Countdown as CountdownType } from "@/types";
+import { Countdown } from "@/types";
 import { createQueryString } from "@/utils/queryString";
 import { getBrowserTimeZone } from "@/utils/timezone";
-import { useEffect, useState } from "react";
-import { Countdown } from "@/types";
-import type { Countdown as CountdownType } from "@/types";
+import { Checkbox } from "./ui/checkbox";
 import { DialogClose } from "./ui/dialog";
+import { Label } from "./ui/label";
 
 const filters = [
   {
@@ -59,10 +58,14 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
   });
   const { toast } = useToast();
 
-  useEffect(() => {
-    const subscription = form.watch(() => setLink(undefined));
-    return () => subscription.unsubscribe();
-  }, [form]);
+  useEffect(
+    () =>
+      form.subscribe({
+        formState: { values: true },
+        callback: () => setLink(undefined),
+      }),
+    [form],
+  );
 
   function onSubmit(data: CountdownType) {
     const qs = createQueryString({

@@ -21,7 +21,7 @@ const TickNumber = ({
     >
       {text.split("").map((digit, index) => (
         <span
-          // Keyed from the right so a digit only re-animates when it changes
+          // biome-ignore lint/suspicious/noArrayIndexKey: keyed from the right so a digit only re-animates when it changes
           key={`${text.length - index}-${digit}`}
           className={cn(
             "inline-block",

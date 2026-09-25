@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  CalendarEvent,
+  type CalendarEvent,
   downloadICS,
   toGoogleCalendarUrl,
 } from "@/utils/calendar";

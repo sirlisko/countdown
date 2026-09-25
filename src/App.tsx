@@ -1,6 +1,6 @@
-import CountdownPage from "./components/CountdownPage";
-import { Toaster } from "@/components/ui/toaster";
 import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/toaster";
+import CountdownPage from "./components/CountdownPage";
 
 const App = () => (
   <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
