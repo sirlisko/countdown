@@ -14,6 +14,53 @@ import type { Countdown } from "@/types";
 const loadInputForm = () => import("./InputForm");
 const InputForm = lazy(loadInputForm);
 
+const Bar = ({ className }: { className: string }) => (
+  <div className={`bg-muted ${className}`} />
+);
+
+const CheckboxRow = () => (
+  <div className="flex gap-3">
+    <Bar className="size-4 shrink-0" />
+    <div className="flex-1 space-y-2">
+      <Bar className="h-3.5 w-2/5" />
+      <Bar className="h-3 w-full" />
+      <Bar className="h-3 w-3/5" />
+    </div>
+  </div>
+);
+
+// Mirrors the form's layout so the dialog doesn't jump in height once it loads
+const InputFormSkeleton = () => (
+  <div aria-hidden className="space-y-6 motion-safe:animate-pulse">
+    <div className="space-y-2">
+      <Bar className="h-3.5 w-16" />
+      <Bar className="h-9 w-full" />
+    </div>
+    <div className="grid grid-cols-2 gap-4">
+      {[0, 1].map((i) => (
+        <div key={i} className="space-y-2">
+          <Bar className="h-3.5 w-10" />
+          <Bar className="h-9 w-full" />
+        </div>
+      ))}
+    </div>
+    <CheckboxRow />
+    <CheckboxRow />
+    <div className="space-y-2">
+      <Bar className="h-3.5 w-24" />
+      <Bar className="h-3 w-3/5" />
+      <div className="flex gap-4 pt-4">
+        {[0, 1, 2].map((i) => (
+          <Bar key={i} className="h-4 w-16" />
+        ))}
+      </div>
+    </div>
+    <CheckboxRow />
+    <CheckboxRow />
+    <Bar className="h-11 w-full" />
+  </div>
+);
+
 const DialogNew = memo(
   ({
     defaultValues,
@@ -60,8 +107,10 @@ const DialogNew = memo(
               Make your personalised countdown
             </DialogDescription>
           </DialogHeader>
-          <Suspense>
-            <InputForm defaultValues={isEdit ? defaultValues : undefined} />
+          <Suspense fallback={<InputFormSkeleton />}>
+            <div className="fade-in-0 motion-safe:animate-in">
+              <InputForm defaultValues={isEdit ? defaultValues : undefined} />
+            </div>
           </Suspense>
         </DialogContent>
       </Dialog>
