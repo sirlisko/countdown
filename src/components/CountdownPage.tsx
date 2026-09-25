@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { format } from "date-fns";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { useFullscreen } from "@/hooks/use-fullscreen";
 import { useNow } from "@/hooks/use-now";
+import type { Countdown as CountdownType } from "@/types";
 import {
   formatCompact,
   isValidDate,
@@ -11,7 +12,6 @@ import {
 } from "@/utils/date";
 import { readCountdown } from "@/utils/location";
 import { wallClockIn } from "@/utils/timezone";
-import type { Countdown as CountdownType } from "@/types";
 import Countdown from "./Counter/Countdown";
 import Footer from "./Footer";
 import Header from "./Header";

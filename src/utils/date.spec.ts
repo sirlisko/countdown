@@ -1,10 +1,10 @@
 import {
-  isValidDate,
-  normaliseDateOrder,
-  getTimeDifferences,
   formatCompact,
+  getTimeDifferences,
+  isValidDate,
   localDateAsUTC,
   nextYearly,
+  normaliseDateOrder,
 } from "./date";
 
 describe("date util", () => {

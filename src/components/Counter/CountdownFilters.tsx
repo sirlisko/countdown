@@ -4,7 +4,7 @@ import {
   differenceInSeconds,
 } from "date-fns";
 
-import { CountdownFromString } from "@/types";
+import type { CountdownFromString } from "@/types";
 
 const totals = [
   { id: "h", label: "Total hours", difference: differenceInHours },

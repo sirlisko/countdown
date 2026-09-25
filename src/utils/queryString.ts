@@ -1,5 +1,5 @@
 import queryString from "query-string";
-import { Countdown } from "@/types";
+import type { Countdown } from "@/types";
 import { localDateAsUTC, toFloatingISO } from "./date";
 import {
   getBrowserTimeZone,

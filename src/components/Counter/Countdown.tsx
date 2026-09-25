@@ -1,11 +1,9 @@
-import { getTimeDifferences } from "@/utils/date";
 import { cn } from "@/lib/utils";
-
+import type { CountdownFromString } from "@/types";
+import { getTimeDifferences } from "@/utils/date";
 import CountdownFilters from "./CountdownFilters";
 import ProgressBar from "./ProgressBar";
 import TickNumber from "./TickNumber";
-
-import { CountdownFromString } from "@/types";
 
 const Countdown = ({
   from,

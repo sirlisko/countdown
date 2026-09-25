@@ -2,7 +2,7 @@ import { EnterFullScreenIcon } from "@radix-ui/react-icons";
 
 import { Button } from "@/components/ui/button";
 import { isFullscreenSupported } from "@/hooks/use-fullscreen";
-import { Countdown } from "@/types";
+import type { Countdown } from "@/types";
 import type { CalendarEvent } from "@/utils/calendar";
 import CalendarMenu from "./CalendarMenu";
 import DialogNew from "./DialogNew";

@@ -2,8 +2,8 @@
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { Dialog } from "@/components/ui/dialog";
-import InputForm from "../InputForm";
 import type { Countdown } from "@/types";
+import InputForm from "../InputForm";
 
 const renderForm = (defaultValues?: Countdown) =>
   render(

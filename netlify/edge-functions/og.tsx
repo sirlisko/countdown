@@ -1,5 +1,6 @@
-import React from "https://esm.sh/react@18.2.0";
 import { ImageResponse } from "https://deno.land/x/og_edge@0.0.6/mod.ts";
+// biome-ignore lint/correctness/noUnusedImports: classic JSX runtime on Deno needs React in scope
+import React from "https://esm.sh/react@18.2.0";
 import type { Config } from "@netlify/edge-functions";
 import { formatTarget, readSharedCountdown } from "../lib/countdown.ts";
 
