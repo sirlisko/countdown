@@ -1,4 +1,4 @@
-# Fancy Countdown [![Test Status][test-image]][test-url] [![Build Status][build-image]][build-url]
+# Countdown [![Test Status][test-image]][test-url] [![Build Status][build-image]][build-url]
 
 Create a countdown (or count-up) to any moment and share it as a link. The whole countdown lives in the URL, so there's no account and nothing stored on a server.
 
