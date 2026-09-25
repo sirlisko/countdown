@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import CountdownPage from "../CountdownPage";
 
 const visit = (path: string) => window.history.replaceState(null, "", path);
@@ -39,5 +40,23 @@ describe("CountdownPage", () => {
     expect(
       screen.queryByRole("button", { name: "Add to calendar" }),
     ).not.toBeInTheDocument();
+  });
+
+  it("should invite visitors to make their own from a sample", async () => {
+    visit("/");
+    render(<CountdownPage />);
+    expect(screen.getByText("Example")).toBeInTheDocument();
+    await userEvent.click(
+      screen.getByRole("button", { name: "Make your own →" }),
+    );
+    expect(
+      screen.getByRole("dialog", { name: "New countdown" }),
+    ).toBeInTheDocument();
+  });
+
+  it("should not flag shared countdowns as examples", () => {
+    visit("/?m=Launch&t=2999-01-01T00%3A00%3A00.000Z&z=UTC");
+    render(<CountdownPage />);
+    expect(screen.queryByText("Example")).not.toBeInTheDocument();
   });
 });

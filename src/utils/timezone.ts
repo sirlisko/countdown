@@ -83,8 +83,8 @@ export const zonedWallClockToInstant = (
   timeZone: string,
 ) => {
   const [year, month, day] = date.split("-").map(Number);
-  const [hour, minute] = time.split(":").map(Number);
-  return resolve(utc(year, month - 1, day, hour, minute), timeZone);
+  const [hour, minute, second = 0] = time.split(":").map(Number);
+  return resolve(utc(year, month - 1, day, hour, minute, second), timeZone);
 };
 
 const daysInMonth = (year: number, month: number) =>

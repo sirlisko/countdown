@@ -27,6 +27,12 @@ describe("zonedWallClockToInstant", () => {
     ).toEqual(new Date("2026-03-29T02:30:00.000Z"));
   });
 
+  it("should keep seconds when given", () => {
+    expect(zonedWallClockToInstant("2038-01-19", "03:14:08", "UTC")).toEqual(
+      new Date("2038-01-19T03:14:08.000Z"),
+    );
+  });
+
   it("should handle years below 100", () => {
     expect(
       zonedWallClockToInstant("0050-06-01", "12:00", "UTC").getUTCFullYear(),
