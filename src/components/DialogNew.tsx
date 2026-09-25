@@ -1,5 +1,5 @@
 import { Pencil1Icon, PlusIcon } from "@radix-ui/react-icons";
-import { memo, useState } from "react";
+import { lazy, memo, Suspense, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,7 +10,9 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import type { Countdown } from "@/types";
-import InputForm from "./InputForm";
+
+const loadInputForm = () => import("./InputForm");
+const InputForm = lazy(loadInputForm);
 
 const DialogNew = memo(
   ({
@@ -29,6 +31,8 @@ const DialogNew = memo(
               variant="ghost"
               className={triggerClassName}
               onClick={() => setIsEdit(true)}
+              onPointerEnter={loadInputForm}
+              onFocus={loadInputForm}
             >
               <Pencil1Icon className="size-4" />
               <span className="sr-only sm:not-sr-only">Edit</span>
@@ -40,6 +44,8 @@ const DialogNew = memo(
             variant="ghost"
             className={triggerClassName}
             onClick={() => setIsEdit(false)}
+            onPointerEnter={loadInputForm}
+            onFocus={loadInputForm}
           >
             <PlusIcon className="size-4" />
             <span className="sr-only sm:not-sr-only">New</span>
@@ -54,7 +60,9 @@ const DialogNew = memo(
               Make your personalised countdown
             </DialogDescription>
           </DialogHeader>
-          <InputForm defaultValues={isEdit ? defaultValues : undefined} />
+          <Suspense>
+            <InputForm defaultValues={isEdit ? defaultValues : undefined} />
+          </Suspense>
         </DialogContent>
       </Dialog>
     );
