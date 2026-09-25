@@ -1,92 +1,141 @@
-import React, { useState, useEffect } from "react";
-import { getQueryString } from "../utils/queryString";
-import { isValidDate, normaliseDateOrder } from "../utils/date";
-import DialogNew from "./DialogNew";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { format } from "date-fns";
 
-import dates from "../dates";
+import { useFullscreen } from "@/hooks/use-fullscreen";
+import { useNow } from "@/hooks/use-now";
+import {
+  formatCompact,
+  isValidDate,
+  nextYearly,
+  normaliseDateOrder,
+} from "@/utils/date";
+import { readCountdown } from "@/utils/location";
+import { wallClockIn } from "@/utils/timezone";
 import type { Countdown as CountdownType } from "@/types";
 import Countdown from "./Counter/Countdown";
-import DynammicTitle from "./Counter/DynamicTitle";
+import Footer from "./Footer";
+import Header from "./Header";
+import Headline from "./Headline";
+import InvalidLink from "./InvalidLink";
+import ZeroFlash from "./ZeroFlash";
 
-const CountdownPage: React.FC = () => {
-  const [now, setNow] = useState(new Date());
-  const [then, setThen] = useState<Date>();
-  const [message, setMessage] = useState<string>();
-  const [filters, setFilters] = useState<string[]>([]);
-  const [obfuscate, setObfuscate] = useState(false);
+const CountdownPage = () => {
+  const [countdown] = useState(() => readCountdown(window.location));
+  const { then, created, timeZone, yearly, message, filters, isSample } =
+    countdown;
+  const now = useNow();
+  const { isFullscreen, toggle: toggleFullscreen } = useFullscreen();
+  const [showZero, setShowZero] = useState(false);
+  const dismissZero = useCallback(() => setShowZero(false), []);
+
+  const isValid = isValidDate(then);
+  const repeat =
+    isValid && yearly ? nextYearly(then, now, timeZone) : undefined;
+  const target = repeat?.next ?? then;
+  const isPast = now.getTime() >= target.getTime();
+
+  // Flash when the target seen on the previous tick has just been reached,
+  // which also catches yearly countdowns rolling over to next year
+  const previousTick = useRef({ now, target });
+  useEffect(() => {
+    const previous = previousTick.current;
+    if (isValid && previous.target > previous.now && previous.target <= now) {
+      setShowZero(true);
+    }
+    previousTick.current = { now, target };
+  }, [isValid, now, target]);
 
   useEffect(() => {
-    const interval = setInterval(() => setNow(new Date()), 1000);
+    document.documentElement.dataset.phase = isPast ? "past" : "future";
+  }, [isPast]);
 
-    const path = window.location.pathname.split("/").pop();
-    const searchParams = new URLSearchParams(window.location.search);
+  const { from, to, isInverted } = normaliseDateOrder(now, target);
 
-    const qs = path
-      ? getQueryString(atob(path))
-      : searchParams && getQueryString(searchParams.toString());
-    setObfuscate(!!path);
+  useEffect(() => {
+    const label = message && !isSample ? message : "Countdown";
+    document.title = isValid
+      ? `T${isInverted ? "+" : "-"}${formatCompact(to, from)} · ${label}`
+      : "Countdown";
+  }, [isValid, isInverted, from, to, message, isSample]);
 
-    if (qs && qs.then) {
-      const { message, then, filters } = qs;
-      setThen(then);
-      setMessage(message || "\u00A0");
-      if (filters) setFilters(filters);
+  const defaultValues = useMemo<CountdownType | undefined>(
+    () =>
+      isValid
+        ? {
+            message,
+            ...(timeZone
+              ? wallClockIn(then, timeZone)
+              : {
+                  date: format(then, "yyyy-MM-dd"),
+                  time: format(then, "HH:mm"),
+                }),
+            filters,
+            obfuscate: countdown.obfuscate,
+            progress: !!created,
+            created: created?.toISOString(),
+            sameMoment: !!timeZone,
+            timeZone,
+            yearly,
+          }
+        : undefined,
+    [countdown, isValid, message, then, created, timeZone, yearly, filters],
+  );
 
-      document.title =
-        new Date().getTime() < then.getTime()
-          ? `${message ? message + " - " : ""}How much time left? - Countdown`
-          : `${message ? message + " - " : ""}How long ago? - Countdown`;
-    } else {
-      const { date, text, filters } =
-        dates[Math.floor(Math.random() * dates.length)];
-      setThen(date);
-      setMessage(text);
-      if (filters) setFilters(filters);
-    }
+  const calendarEvent = useMemo(
+    () =>
+      isValid
+        ? {
+            title: (!isSample && message) || "Countdown",
+            start: then,
+            url: window.location.href,
+            timeZone,
+            yearly,
+          }
+        : undefined,
+    [isValid, yearly, then, isSample, message, timeZone],
+  );
 
-    return () => clearInterval(interval);
-  }, []);
-
-  if (!then) {
-    return null;
-  }
-
-  const { from, to, isInverted } = normaliseDateOrder(now, then);
-
-  if (!isValidDate(then)) {
-    return (
-      <div className="flex h-screen">
-        <div className="m-auto text-center text-2xl p-3">
-          Oops! Something went wrong with your date
-          <div className="text-center mt-20">
-            <DialogNew />
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  const defaultValues: CountdownType = {
-    message,
-    date: then.toISOString().split("T")[0],
-    time: then.toTimeString().split(" ")[0].substring(0, 5),
-    filters,
-    obfuscate,
-  };
+  const progressStart =
+    created && repeat && repeat.previous > created ? repeat.previous : created;
 
   return (
-    <>
-      <DynammicTitle message={message} />
-      <Countdown
-        from={from}
-        to={to}
-        filters={filters}
-        isInverted={isInverted}
-      />
-      <div className="text-center">
-        <DialogNew defaultValues={defaultValues} />
-      </div>
-    </>
+    <div className="flex min-h-dvh flex-col">
+      {!isFullscreen && (
+        <Header
+          isPast={isValid ? isPast : undefined}
+          defaultValues={defaultValues}
+          calendarEvent={isPast && !yearly ? undefined : calendarEvent}
+          onFullscreen={toggleFullscreen}
+        />
+      )}
+      <main className="flex flex-1 flex-col justify-between gap-12 px-4 py-8 sm:px-8 sm:py-12">
+        {isValid ? (
+          <>
+            <Headline
+              message={message}
+              then={target}
+              timeZone={timeZone}
+              yearly={yearly}
+            />
+            <Countdown
+              from={from}
+              to={to}
+              filters={filters}
+              isInverted={isInverted}
+              progress={
+                progressStart && progressStart < target
+                  ? { start: progressStart, end: target, now }
+                  : undefined
+              }
+            />
+          </>
+        ) : (
+          <InvalidLink />
+        )}
+      </main>
+      {!isFullscreen && <Footer />}
+      {showZero && <ZeroFlash message={message} onDismiss={dismissZero} />}
+    </div>
   );
 };
 

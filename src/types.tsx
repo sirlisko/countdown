@@ -2,10 +2,15 @@ import { z } from "zod";
 
 export const Countdown = z.object({
   message: z.string().optional(),
-  date: z.string().optional(),
+  date: z.string().min(1, "Pick a date"),
   time: z.string(),
   filters: z.array(z.string()),
   obfuscate: z.boolean().optional(),
+  progress: z.boolean().optional(),
+  created: z.string().optional(),
+  sameMoment: z.boolean().optional(),
+  timeZone: z.string().optional(),
+  yearly: z.boolean().optional(),
 });
 
 export type Countdown = z.infer<typeof Countdown>;
@@ -15,4 +20,5 @@ export interface CountdownFromString {
   to: Date;
   filters: string[];
   isInverted?: boolean;
+  progress?: { start: Date; end: Date; now: Date };
 }

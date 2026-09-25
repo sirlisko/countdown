@@ -1,31 +1,33 @@
+import { isFullscreenSupported } from "@/hooks/use-fullscreen";
+
+const link = "underline-offset-4 hover:bg-signal hover:text-signal-foreground";
+
 const Footer = () => (
-  <footer className="text-sm text-muted-foreground pb-3 pt-10 text-center whitespace-nowrap">
-    <p>
-      <span className="block sm:inline">
-        Created with ❤ by{" "}
-        <a
-          className="underline"
-          href="https://sirlisko.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          sirlisko
-        </a>
-        .
-      </span>{" "}
-      <span className="block sm:inline">
-        View project source on{" "}
-        <a
-          className="underline"
-          href="https://github.com/sirLisko/countdown"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          github
-        </a>
-        .
+  <footer className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-t-2 border-foreground px-4 py-3 font-mono text-[10px] uppercase tracking-widest sm:text-xs">
+    <span>
+      Built by{" "}
+      <a
+        className={link}
+        href="https://sirlisko.com"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        sirlisko ↗
+      </a>
+    </span>
+    {isFullscreenSupported && (
+      <span className="hidden text-muted-foreground sm:inline">
+        [F] Fullscreen
       </span>
-    </p>
+    )}
+    <a
+      className={link}
+      href="https://github.com/sirLisko/countdown"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Source ↗
+    </a>
   </footer>
 );
 

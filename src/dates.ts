@@ -1,7 +1,13 @@
+const atYear = (year: number) => {
+  const date = new Date(2000, 0, 1);
+  date.setFullYear(year);
+  return date;
+};
+
 const countdowns: { date: Date; text: string; filters?: string[] }[] = [
   {
     date: new Date(new Date().getFullYear() + 1, 0, 1, 0, 0, 0),
-    text: "since the start of next year",
+    text: "until the start of next year",
   },
   {
     date: new Date(new Date().getFullYear(), 0, 1, 0, 0, 0),
@@ -53,11 +59,11 @@ const countdowns: { date: Date; text: string; filters?: string[] }[] = [
   },
   {
     date: new Date(2100, 0, 1, 0, 0), // January 1, 2100
-    text: "since the start of the 22nd century",
+    text: "until the start of the 22nd century",
   },
   {
-    date: new Date(2030, 1, 1, 0, 0), // January 1, 2030
-    text: "since the anticipated start of the next decade",
+    date: new Date(2030, 0, 1, 0, 0), // January 1, 2030
+    text: "until the start of the next decade",
   },
   {
     date: new Date(2000, 0, 1, 0, 0), // January 1, 2000
@@ -65,7 +71,8 @@ const countdowns: { date: Date; text: string; filters?: string[] }[] = [
     filters: ["m", "s", "h"],
   },
   {
-    date: new Date(0, 0, 1, 0, 0), // January 1, 0000 (approximate)
+    // JS maps years 0-99 to 19xx, so set the year explicitly
+    date: atYear(1), // January 1, 1 AD
     text: "since the start of the Anno Domini (AD) era",
     filters: ["m", "s", "h"],
   },

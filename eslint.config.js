@@ -6,7 +6,7 @@ import reactRefresh from "eslint-plugin-react-refresh";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist"] },
+  { ignores: ["dist", ".netlify"] },
   {
     extends: [
       js.configs.recommended,
@@ -30,5 +30,9 @@ export default tseslint.config(
       ],
     },
     ignores: ["src/components/ui/**/*", "src/hooks/use-toast.ts"],
+  },
+  {
+    files: ["netlify/**/*.{ts,tsx}"],
+    rules: { "react-refresh/only-export-components": "off" },
   },
 );

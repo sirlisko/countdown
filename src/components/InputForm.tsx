@@ -17,6 +17,7 @@ import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
 import { CopyIcon, ExternalLinkIcon, Share1Icon } from "@radix-ui/react-icons";
 import { createQueryString } from "@/utils/queryString";
+import { getBrowserTimeZone } from "@/utils/timezone";
 import { useEffect, useState } from "react";
 import { Countdown } from "@/types";
 import type { Countdown as CountdownType } from "@/types";
@@ -37,9 +38,10 @@ const filters = [
   },
 ] as const;
 
+const canShare = typeof navigator !== "undefined" && "share" in navigator;
+
 const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
-  const [link, setLink] = useState<string | undefined>("");
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [link, setLink] = useState<string>();
 
   const form = useForm<CountdownType>({
     mode: "onTouched",
@@ -49,30 +51,28 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
       filters: [],
       time: "00:00",
       obfuscate: false,
+      progress: false,
+      sameMoment: true,
+      yearly: false,
       date: "",
     },
   });
   const { toast } = useToast();
-  const { isValid } = form.formState;
 
   useEffect(() => {
-    const checkTouchDevice = () => {
-      setIsTouchDevice(
-        "ontouchstart" in window || navigator.maxTouchPoints > 0,
-      );
-    };
-    checkTouchDevice();
-  }, []);
+    const subscription = form.watch(() => setLink(undefined));
+    return () => subscription.unsubscribe();
+  }, [form]);
 
   function onSubmit(data: CountdownType) {
-    if (isValid && data.date) {
-      const qs = createQueryString(data as Countdown);
-      setLink(
-        `${window.location.origin}/${data.obfuscate ? btoa(qs) : `?${qs}`}`,
-      );
-    } else {
-      setLink(undefined);
-    }
+    const qs = createQueryString({
+      ...data,
+      // Editing keeps the original start so the bar doesn't reset
+      created: data.created ?? new Date().toISOString(),
+    });
+    setLink(
+      `${window.location.origin}/${data.obfuscate ? btoa(qs) : `?${qs}`}`,
+    );
   }
 
   function onCopy() {
@@ -85,15 +85,17 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
 
   function onShare() {
     if (!link) return;
-    navigator.share({
-      url: link,
-      title: `${form.getValues("message")} Countdown`,
-    });
+    navigator
+      .share({
+        url: link,
+        title: `${form.getValues("message")} Countdown`,
+      })
+      .catch(() => {});
   }
 
   return (
     <Form {...form}>
-      <form onChange={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
           name="message"
@@ -145,15 +147,58 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
         </div>
         <FormField
           control={form.control}
+          name="sameMoment"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <div className="space-y-2">
+                <FormLabel>Same moment everywhere</FormLabel>
+                <FormDescription>
+                  {field.value
+                    ? `Everyone hits zero together, at this time in ${(
+                        form.getValues("timeZone") ?? getBrowserTimeZone()
+                      ).replace(/_/g, " ")}.`
+                    : "Hits zero at this local time wherever each viewer is, like New Year's Eve."}
+                </FormDescription>
+              </div>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="yearly"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <div className="space-y-2">
+                <FormLabel>Repeat every year</FormLabel>
+                <FormDescription>
+                  Rolls over to next year once it hits zero. Made for birthdays
+                  and anniversaries.
+                </FormDescription>
+              </div>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
           name="filters"
           render={() => (
             <FormItem>
               <div className="mb-4">
-                <FormLabel className="text-base">
-                  Add extra countdowns
-                </FormLabel>
+                <FormLabel>Extra totals</FormLabel>
                 <FormDescription>
-                  Optional, they will be displayed below the main countdown.
+                  Optional, shown below the main countdown.
                 </FormDescription>
               </div>
               <div className="flex space-x-4">
@@ -182,9 +227,7 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
                               }
                             />
                           </FormControl>
-                          <FormLabel className="text-sm font-normal">
-                            {item.label}
-                          </FormLabel>
+                          <FormLabel>{item.label}</FormLabel>
                         </FormItem>
                       );
                     }}
@@ -195,52 +238,76 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
             </FormItem>
           )}
         />
-        {link && (
-          <>
-            <div className="flex items-center space-x-2 mt-5">
-              <div className="grid flex-1 gap-2">
-                <Label htmlFor="link" className="sr-only">
-                  Link
-                </Label>
-                <Input id="link" value={link} readOnly />
+        <FormField
+          control={form.control}
+          name="progress"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <div className="space-y-2">
+                <FormLabel>Progress bar</FormLabel>
+                <FormDescription>
+                  Fills up from the moment you share it until the target.
+                </FormDescription>
               </div>
-              {isTouchDevice ? (
-                <Button size="sm" className="px-3" onClick={onShare}>
-                  <span className="sr-only">Share</span>
-                  <Share1Icon className="h-4 w-4" />
-                </Button>
-              ) : (
-                <DialogClose asChild>
-                  <Button size="sm" className="px-3" onClick={onCopy}>
-                    <span className="sr-only">Copy</span>
-                    <CopyIcon className="h-4 w-4" />
-                  </Button>
-                </DialogClose>
-              )}
-              <Button size="sm" className="px-3" asChild>
-                <a href={link} target="_blank" rel="noopener noreferrer">
-                  <ExternalLinkIcon className="h-4 w-4" />
-                </a>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="obfuscate"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <div className="space-y-2">
+                <FormLabel>Hide details from the URL</FormLabel>
+                <FormDescription>
+                  Scrambles the link so the message isn't readable at a glance.
+                  Not encryption: anyone can decode it.
+                </FormDescription>
+              </div>
+            </FormItem>
+          )}
+        />
+        {link ? (
+          <div className="flex items-center gap-2">
+            <Label htmlFor="link" className="sr-only">
+              Link
+            </Label>
+            <Input id="link" value={link} readOnly className="flex-1" />
+            {canShare && (
+              <Button type="button" size="icon" onClick={onShare}>
+                <span className="sr-only">Share</span>
+                <Share1Icon className="size-4" />
               </Button>
-            </div>
-            <FormField
-              control={form.control}
-              name="obfuscate"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md ">
-                  <FormControl>
-                    <Checkbox
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Obfuscate the link</FormLabel>
-                  </div>
-                </FormItem>
-              )}
-            />
-          </>
+            )}
+            <DialogClose asChild>
+              <Button type="button" size="icon" onClick={onCopy}>
+                <span className="sr-only">Copy</span>
+                <CopyIcon className="size-4" />
+              </Button>
+            </DialogClose>
+            <Button size="icon" asChild>
+              <a href={link} target="_blank" rel="noopener noreferrer">
+                <span className="sr-only">Open</span>
+                <ExternalLinkIcon className="size-4" />
+              </a>
+            </Button>
+          </div>
+        ) : (
+          <Button type="submit" className="h-11 w-full">
+            Generate link
+          </Button>
         )}
       </form>
     </Form>

@@ -6,7 +6,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        inter: ["Poppins", "sans-serif"],
+        sans: ["Space Grotesk Variable", "system-ui", "sans-serif"],
+        mono: ["JetBrains Mono Variable", "ui-monospace", "monospace"],
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -43,6 +44,10 @@ export default {
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
+        },
+        signal: {
+          DEFAULT: "hsl(var(--signal))",
+          foreground: "hsl(var(--signal-foreground))",
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

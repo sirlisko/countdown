@@ -1,13 +1,30 @@
 import queryString from "query-string";
 import { Countdown } from "@/types";
-import { localDateAsUTC } from "./date";
+import { localDateAsUTC, toFloatingISO } from "./date";
+import {
+  getBrowserTimeZone,
+  isValidTimeZone,
+  zonedWallClockToInstant,
+} from "./timezone";
 
+// Links with `z` hold real UTC instants; links without it hold floating
+// wall-clock times that fire at that local time for each viewer
 export const getQueryString = (search: string) => {
-  const { t, m, f } = queryString.parse(search);
+  const { t, m, f, c, z, r } = queryString.parse(search);
+  const isInstant = typeof z === "string";
+  const parse = (value: string) =>
+    isInstant ? new Date(value) : localDateAsUTC(value);
   return {
-    then: typeof t === "string" && localDateAsUTC(t),
+    then: typeof t === "string" && parse(t),
+    created: typeof c === "string" && parse(c),
+    timeZone: isInstant
+      ? isValidTimeZone(z)
+        ? z
+        : getBrowserTimeZone()
+      : undefined,
     message: typeof m === "string" && m,
     filters: typeof f === "string" && f.split(","),
+    yearly: r === "y",
   };
 };
 
@@ -16,12 +33,29 @@ export const createQueryString = ({
   date,
   time,
   filters,
-}: Countdown) =>
-  queryString.stringify(
+  progress,
+  created,
+  sameMoment,
+  timeZone,
+  yearly,
+}: Countdown) => {
+  const zone = sameMoment ? (timeZone ?? getBrowserTimeZone()) : undefined;
+  return queryString.stringify(
     {
       m,
-      t: `${date}T${time}:00.000Z`,
+      t: zone
+        ? zonedWallClockToInstant(date, time, zone).toISOString()
+        : `${date}T${time}:00.000Z`,
+      z: zone,
       f: filters.length ? filters.join(",") : undefined,
+      c:
+        progress && created
+          ? zone
+            ? created
+            : toFloatingISO(new Date(created))
+          : undefined,
+      r: yearly ? "y" : undefined,
     },
     { arrayFormat: "comma" },
   );
+};

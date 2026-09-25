@@ -1,123 +1,163 @@
-@import "@fontsource/poppins";
+@import "@fontsource-variable/space-grotesk";
+@import "@fontsource-variable/jetbrains-mono";
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-body {
-  margin: 0;
-}
-.count {
-  font-size: 7vw;
-  margin: 20vh auto;
-}
-.chief {
-  position: absolute;
-  text-align: center;
-}
-.numbers {
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  font-weight: bold;
-}
-
-.slide-enter {
-  opacity: 0;
-  transform: translate3d(0, -50%, 0);
-}
-.slide-inv-enter {
-  opacity: 0;
-  transform: translate3d(0, 50%, 0);
-}
-.slide-inv-enter.slide-inv-enter-active,
-.slide-enter.slide-enter-active {
-  opacity: 1;
-  transform: translate3d(0, 0, 0);
-  transition: transform 400ms ease, opacity 400ms ease;
-}
-.slide-inv-exit,
-.slide-exit {
-  opacity: 1;
-  transform: translate3d(0, 0, 0);
-}
-.slide-inv-exit.slide-inv-exit-active,
-.slide-exit.slide-exit-active {
-  opacity: 0;
-  transition: transform 400ms ease, opacity 400ms ease;
-}
-.slide-exit.slide-exit-active {
-  transform: translate3d(0, 50%, 0);
-}
-.slide-inv-exit.slide-inv-exit-active {
-  transform: translate3d(0, -50%, 0);
-}
-.slide-enter,
-.slide-exit {
-  .hide-animation {
-    display: none;
-  }
-}
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
+    --background: 60 9% 93%;
+    --foreground: 0 0% 4%;
+    --card: 60 9% 93%;
+    --card-foreground: 0 0% 4%;
+    --popover: 60 9% 93%;
+    --popover-foreground: 0 0% 4%;
+    --primary: 0 0% 4%;
+    --primary-foreground: 60 9% 93%;
+    --secondary: 60 5% 86%;
+    --secondary-foreground: 0 0% 4%;
+    --muted: 60 5% 86%;
+    --muted-foreground: 0 0% 36%;
+    --accent: 0 0% 4%;
+    --accent-foreground: 60 9% 93%;
+    --destructive: 0 84% 50%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --radius: 0.5rem;
+    --border: 0 0% 4%;
+    --input: 0 0% 4%;
+    --ring: 0 0% 4%;
+    --radius: 0rem;
+
+    --signal-future: 73 100% 50%;
+    --signal-past: 18 100% 50%;
+    --signal: var(--signal-future);
+    --signal-foreground: 0 0% 4%;
   }
+
   .dark {
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --background: 0 0% 4%;
+    --foreground: 60 9% 93%;
+    --card: 0 0% 4%;
+    --card-foreground: 60 9% 93%;
+    --popover: 0 0% 4%;
+    --popover-foreground: 60 9% 93%;
+    --primary: 60 9% 93%;
+    --primary-foreground: 0 0% 4%;
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 60 9% 93%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 60%;
+    --accent: 60 9% 93%;
+    --accent-foreground: 0 0% 4%;
+    --destructive: 0 84% 55%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --border: 60 9% 93%;
+    --input: 60 9% 93%;
+    --ring: 60 9% 93%;
   }
-}
-@layer base {
+
+  [data-phase="past"] {
+    --signal: var(--signal-past);
+  }
+
   * {
     @apply border-border;
   }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background font-sans text-foreground antialiased;
+  }
+
+  ::selection {
+    background: hsl(var(--signal));
+    color: hsl(var(--signal-foreground));
+  }
+}
+
+@layer utilities {
+  .grain {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+  }
+}
+
+@keyframes tick {
+  0% {
+    transform: translateY(-18%);
+    clip-path: inset(0 0 55% 0);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateY(6%);
+    clip-path: inset(40% 0 0 0);
+  }
+  100% {
+    transform: none;
+    clip-path: none;
+    opacity: 1;
+  }
+}
+
+@keyframes tick-inverted {
+  0% {
+    transform: translateY(18%);
+    clip-path: inset(55% 0 0 0);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateY(-6%);
+    clip-path: inset(0 0 40% 0);
+  }
+  100% {
+    transform: none;
+    clip-path: none;
+    opacity: 1;
+  }
+}
+
+/* Two inversions over ~1s stays under the WCAG three-flashes-per-second limit */
+@keyframes zero-flash {
+  0%,
+  30%,
+  60% {
+    background: hsl(var(--foreground));
+    color: hsl(var(--background));
+  }
+  15%,
+  45%,
+  100% {
+    background: hsl(var(--signal));
+    color: hsl(var(--signal-foreground));
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+.animate-tick {
+  animation: tick 160ms steps(3, end);
+}
+.animate-tick-inverted {
+  animation: tick-inverted 160ms steps(3, end);
+}
+.animate-zero-flash {
+  animation: zero-flash 1.2s steps(1, end) forwards;
+}
+.animate-blink {
+  animation: blink 1s steps(1, end) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-tick,
+  .animate-tick-inverted,
+  .animate-blink {
+    animation: none;
+  }
+  .animate-zero-flash {
+    animation: none;
+    background: hsl(var(--signal));
+    color: hsl(var(--signal-foreground));
   }
 }

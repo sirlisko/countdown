@@ -14,16 +14,25 @@ pnpm install
 pnpm start
 ```
 
+## Run the tests
+
+```bash
+pnpm test        # unit and component tests, in watch mode
+pnpm test:e2e    # builds the app and drives it in Chromium
+```
+
+The first e2e run needs a browser: `pnpm exec playwright install chromium`.
+
 ## The stack
 
 - WebApp scaffolded via [Vite](https://vitejs.dev/)
 - Typecheck and superset of JS by [Typescript](https://www.typescriptlang.org/)
 - Check the syntax and formatting of the JS, via [ESLint](http://eslint.org/) and [Prettier](https://prettier.io/)
-- Unit tests with [Vitest](https://vitest.dev/)
+- Unit and component tests with [Vitest](https://vitest.dev/) and [Testing Library](https://testing-library.com/), end-to-end tests with [Playwright](https://playwright.dev/)
 - CI using [Github Actions](https://github.com/features/actions)
 - Styling [Tailwind CSS](https://tailwindcss.com/)
 - UI Components [Shadcn/ui](https://ui.shadcn.com)
-- Hosted on [Netlify](https://netlify.com)
+- Hosted on [Netlify](https://netlify.com), with Edge Functions rendering link-preview (Open Graph) images
 
 It's possible to [check out the v1 of the project](https://github.com/sirLisko/countdown/tree/v0.1), running Create React App, Jest, Emotion and Babel Macros.
 
