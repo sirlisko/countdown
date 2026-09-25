@@ -13,6 +13,7 @@ import {
 import { readCountdown } from "@/utils/location";
 import { wallClockIn } from "@/utils/timezone";
 import Countdown from "./Counter/Countdown";
+import type { DialogState } from "./DialogNew";
 import Footer from "./Footer";
 import Header from "./Header";
 import Headline from "./Headline";
@@ -27,6 +28,14 @@ const CountdownPage = () => {
   const { isFullscreen, toggle: toggleFullscreen } = useFullscreen();
   const [showZero, setShowZero] = useState(false);
   const dismissZero = useCallback(() => setShowZero(false), []);
+  const [dialog, setDialog] = useState<DialogState>({
+    open: false,
+    isEdit: false,
+  });
+  const createCountdown = useCallback(
+    () => setDialog({ open: true, isEdit: false }),
+    [],
+  );
 
   const isValid = isValidDate(then);
   const repeat =
@@ -105,6 +114,8 @@ const CountdownPage = () => {
           isPast={isValid ? isPast : undefined}
           defaultValues={defaultValues}
           calendarEvent={isPast && !yearly ? undefined : calendarEvent}
+          dialog={dialog}
+          onDialogChange={setDialog}
           onFullscreen={toggleFullscreen}
         />
       )}
@@ -116,6 +127,7 @@ const CountdownPage = () => {
               then={target}
               timeZone={timeZone}
               yearly={yearly}
+              onCreate={isSample ? createCountdown : undefined}
             />
             <Countdown
               from={from}

@@ -5,7 +5,7 @@ import { isFullscreenSupported } from "@/hooks/use-fullscreen";
 import type { Countdown } from "@/types";
 import type { CalendarEvent } from "@/utils/calendar";
 import CalendarMenu from "./CalendarMenu";
-import DialogNew from "./DialogNew";
+import DialogNew, { type DialogState } from "./DialogNew";
 import { ModeToggle } from "./mode-toggler";
 
 const cell = "h-full border-l-2 border-foreground px-3 sm:px-4";
@@ -14,11 +14,15 @@ const Header = ({
   isPast,
   defaultValues,
   calendarEvent,
+  dialog,
+  onDialogChange,
   onFullscreen,
 }: {
   isPast?: boolean;
   defaultValues?: Countdown;
   calendarEvent?: CalendarEvent;
+  dialog: DialogState;
+  onDialogChange: (state: DialogState) => void;
   onFullscreen: () => void;
 }) => (
   <header className="flex h-14 items-stretch border-b-2 border-foreground font-mono text-xs uppercase tracking-widest">
@@ -38,7 +42,12 @@ const Header = ({
       </div>
     )}
     <nav className="ml-auto flex items-stretch">
-      <DialogNew defaultValues={defaultValues} triggerClassName={cell} />
+      <DialogNew
+        defaultValues={defaultValues}
+        triggerClassName={cell}
+        state={dialog}
+        onStateChange={onDialogChange}
+      />
       {calendarEvent && <CalendarMenu event={calendarEvent} className={cell} />}
       {isFullscreenSupported && (
         <Button

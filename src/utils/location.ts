@@ -1,6 +1,8 @@
-import dates from "@/dates";
-import { isValidDate } from "./date";
+import { format } from "date-fns";
+import samples, { type Sample } from "@/dates";
+import { isValidDate, localDateAsUTC } from "./date";
 import { getQueryString } from "./queryString";
+import { zonedWallClockToInstant } from "./timezone";
 
 export interface CountdownState {
   then: Date;
@@ -12,6 +14,36 @@ export interface CountdownState {
   obfuscate: boolean;
   isSample: boolean;
 }
+
+const sampleInstant = ({ date, time = "00:00", timeZone }: Sample) =>
+  timeZone
+    ? zonedWallClockToInstant(date, time, timeZone)
+    : localDateAsUTC(`${date}T${time}Z`);
+
+const randomOf = <T>(list: T[]) =>
+  list[Math.floor(Math.random() * list.length)];
+
+// Weighted towards upcoming events so the home page usually counts down
+const pickSample = (now: Date) => {
+  const today = format(now, "yyyy-MM-dd");
+  const upcoming = samples.filter(({ date }) => date > today);
+  return randomOf(Math.random() < 0.5 ? upcoming : samples);
+};
+
+const readSample = (): CountdownState => {
+  const now = new Date();
+  const sample = pickSample(now);
+  const then = sampleInstant(sample);
+  return {
+    then,
+    message: `${then > now ? "until" : "since"} ${sample.event}`,
+    timeZone: sample.timeZone,
+    yearly: false,
+    filters: sample.filters ?? [],
+    obfuscate: false,
+    isSample: true,
+  };
+};
 
 export const readCountdown = ({
   pathname,
@@ -47,13 +79,5 @@ export const readCountdown = ({
     };
   }
 
-  const sample = dates[Math.floor(Math.random() * dates.length)];
-  return {
-    then: sample.date,
-    message: sample.text,
-    yearly: false,
-    filters: sample.filters ?? [],
-    obfuscate: false,
-    isSample: true,
-  };
+  return readSample();
 };

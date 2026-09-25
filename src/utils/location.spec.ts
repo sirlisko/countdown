@@ -1,3 +1,4 @@
+import samples from "@/dates";
 import { readCountdown } from "./location";
 
 describe("readCountdown", () => {
@@ -36,7 +37,36 @@ describe("readCountdown", () => {
     expect(Number.isNaN(countdown.then.getTime())).toBe(true);
   });
 
-  it("should fall back to a sample countdown", () => {
-    expect(readCountdown({ pathname: "/", search: "" }).isSample).toBe(true);
+  describe("samples", () => {
+    const home = { pathname: "/", search: "" };
+    const pick = (event: string) => {
+      const index = samples.findIndex((sample) => sample.event === event);
+      // The first roll skips the upcoming-only pool, the second picks the index
+      vi.spyOn(Math, "random")
+        .mockReturnValueOnce(0.99)
+        .mockReturnValueOnce((index + 0.5) / samples.length);
+    };
+    afterEach(() => vi.restoreAllMocks());
+
+    it("should fall back to a sample countdown", () => {
+      expect(readCountdown(home).isSample).toBe(true);
+    });
+
+    it.each(samples)("should resolve $event", (sample) => {
+      pick(sample.event);
+      const { then, message, timeZone } = readCountdown(home);
+      expect(Number.isNaN(then.getTime())).toBe(false);
+      expect(timeZone).toBe(sample.timeZone);
+      expect(message).toBe(
+        `${then > new Date() ? "until" : "since"} ${sample.event}`,
+      );
+    });
+
+    it("should pin events to their own time zone", () => {
+      pick("the Berlin Wall opened");
+      expect(readCountdown(home).then).toEqual(
+        new Date("1989-11-09T22:30:00.000Z"),
+      );
+    });
   });
 });

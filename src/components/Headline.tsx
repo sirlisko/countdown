@@ -20,11 +20,13 @@ const Headline = ({
   then,
   timeZone,
   yearly,
+  onCreate,
 }: {
   message?: string;
   then: Date;
   timeZone?: string;
   yearly?: boolean;
+  onCreate?: () => void;
 }) => (
   <section className="flex flex-col gap-4 sm:gap-6">
     <p className="flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[10px] uppercase tracking-widest sm:text-xs">
@@ -41,6 +43,20 @@ const Headline = ({
       {timeZone && timeZone !== getBrowserTimeZone() && (
         <span className="text-muted-foreground">
           ({wallClockIn(then, timeZone).time} in {city(timeZone)})
+        </span>
+      )}
+      {onCreate && (
+        <span className="flex items-center gap-2">
+          <span className="border border-dashed border-foreground px-1.5 py-px">
+            Example
+          </span>
+          <button
+            type="button"
+            onClick={onCreate}
+            className="underline decoration-2 underline-offset-4 hover:bg-foreground hover:text-background"
+          >
+            Make your own →
+          </button>
         </span>
       )}
     </p>
