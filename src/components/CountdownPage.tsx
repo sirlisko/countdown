@@ -22,7 +22,7 @@ import ZeroFlash from "./ZeroFlash";
 
 const CountdownPage = () => {
   const [countdown] = useState(() => readCountdown(window.location));
-  const { then, created, timeZone, yearly, message, filters, isSample } =
+  const { then, created, timeZone, yearly, message, link, filters, isSample } =
     countdown;
   const now = useNow();
   const { isFullscreen, toggle: toggleFullscreen } = useFullscreen();
@@ -127,6 +127,7 @@ const CountdownPage = () => {
               then={target}
               timeZone={timeZone}
               yearly={yearly}
+              link={link}
               onCreate={isSample ? createCountdown : undefined}
             />
             <Countdown

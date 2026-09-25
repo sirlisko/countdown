@@ -54,6 +54,21 @@ describe("CountdownPage", () => {
     ).toBeInTheDocument();
   });
 
+  it("should link examples to background reading", () => {
+    vi.spyOn(Math, "random").mockReturnValue(0.99);
+    visit("/");
+    render(<CountdownPage />);
+    expect(
+      screen.getByRole("link", {
+        name: "Read about Columbus reached the Americas on Wikipedia",
+      }),
+    ).toHaveAttribute(
+      "href",
+      "https://en.wikipedia.org/wiki/Voyages_of_Christopher_Columbus",
+    );
+    vi.restoreAllMocks();
+  });
+
   it("should not flag shared countdowns as examples", () => {
     visit("/?m=Launch&t=2999-01-01T00%3A00%3A00.000Z&z=UTC");
     render(<CountdownPage />);

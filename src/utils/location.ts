@@ -10,6 +10,7 @@ export interface CountdownState {
   timeZone?: string;
   yearly: boolean;
   message?: string;
+  link?: { href: string; event: string };
   filters: string[];
   obfuscate: boolean;
   isSample: boolean;
@@ -38,6 +39,7 @@ const readSample = (): CountdownState => {
     then,
     message: `${then > now ? "until" : "since"} ${sample.event}`,
     timeZone: sample.timeZone,
+    link: sample.link ? { href: sample.link, event: sample.event } : undefined,
     yearly: false,
     filters: sample.filters ?? [],
     obfuscate: false,

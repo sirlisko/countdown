@@ -20,12 +20,14 @@ const Headline = ({
   then,
   timeZone,
   yearly,
+  link,
   onCreate,
 }: {
   message?: string;
   then: Date;
   timeZone?: string;
   yearly?: boolean;
+  link?: { href: string; event: string };
   onCreate?: () => void;
 }) => (
   <section className="flex flex-col gap-4 sm:gap-6">
@@ -50,6 +52,17 @@ const Headline = ({
           <span className="border border-dashed border-foreground px-1.5 py-px">
             Example
           </span>
+          {link && (
+            <a
+              href={link.href}
+              aria-label={`Read about ${link.event} on Wikipedia`}
+              target="_blank"
+              rel="noreferrer"
+              className="underline decoration-2 underline-offset-4 hover:bg-foreground hover:text-background"
+            >
+              Wikipedia ↗
+            </a>
+          )}
           <button
             type="button"
             onClick={onCreate}
