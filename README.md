@@ -35,6 +35,10 @@ pnpm install
 pnpm start
 ```
 
+## Analytics
+
+Production builds load [Umami](https://umami.is/) when `VITE_UMAMI_WEBSITE_ID` is set. Pageviews never include the countdown itself: the query string is dropped and obfuscated links are recorded as `/hidden`.
+
 ## Run the tests
 
 ```bash
