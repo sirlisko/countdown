@@ -1,8 +1,5 @@
 import { cn } from "@/lib/utils";
 
-// JetBrains Mono glyphs advance 0.6em, so this fills the cell's width
-const MONO_ADVANCE = 0.6;
-
 const TickNumber = ({
   value,
   isInverted,
@@ -14,10 +11,7 @@ const TickNumber = ({
   return (
     <span
       aria-hidden
-      className="block self-end whitespace-nowrap font-mono font-extrabold leading-[0.8] tabular-nums tracking-tighter"
-      style={{
-        fontSize: `min(calc(92cqi / ${text.length * MONO_ADVANCE}), 34vh)`,
-      }}
+      className="block self-end whitespace-nowrap font-mono font-extrabold text-(length:--fit) leading-[0.8] tabular-nums tracking-tighter sm:text-(length:--fit-sm)"
     >
       {text.split("").map((digit, index) => (
         <span
