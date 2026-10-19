@@ -1,4 +1,4 @@
-const InvalidLink = () => (
+const InvalidLink = ({ onCreate }: { onCreate: () => void }) => (
   <section className="flex flex-col gap-6">
     <p className="font-mono text-xs uppercase tracking-widest">
       <span className="bg-destructive px-1.5 py-0.5 text-destructive-foreground">
@@ -11,9 +11,13 @@ const InvalidLink = () => (
       <br />
       date.
     </h1>
-    <p className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
-      Hit “New” to make your own.
-    </p>
+    <button
+      type="button"
+      onClick={onCreate}
+      className="self-start font-mono text-xs uppercase tracking-widest underline decoration-2 underline-offset-4 hover:bg-foreground hover:text-background"
+    >
+      Make your own →
+    </button>
   </section>
 );
 

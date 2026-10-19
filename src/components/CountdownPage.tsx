@@ -143,7 +143,7 @@ const CountdownPage = () => {
             />
           </>
         ) : (
-          <InvalidLink />
+          <InvalidLink onCreate={createCountdown} />
         )}
       </main>
       {!isFullscreen && <Footer />}

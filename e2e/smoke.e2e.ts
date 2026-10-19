@@ -41,4 +41,8 @@ test("explain a broken link", async ({ page }) => {
   await expect(
     page.getByText("This link doesn't hold a valid date"),
   ).toBeVisible();
+  await page.getByRole("button", { name: "Make your own" }).click();
+  await expect(
+    page.getByRole("dialog", { name: "New countdown" }),
+  ).toBeVisible();
 });
