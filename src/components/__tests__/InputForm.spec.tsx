@@ -88,6 +88,25 @@ describe("InputForm", () => {
     );
   });
 
+  it("should select the link when the clipboard refuses it", async () => {
+    const writeText = vi.fn().mockRejectedValue(new Error("denied"));
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText },
+      configurable: true,
+    });
+    renderForm();
+    pickDate("2030-01-01");
+    await userEvent.click(
+      screen.getByRole("button", { name: "Generate link" }),
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Copy" }));
+
+    const input = screen.getByLabelText<HTMLInputElement>("Link");
+    expect(writeText).toHaveBeenCalledWith(input.value);
+    await waitFor(() => expect(input.selectionEnd).toBe(input.value.length));
+    expect(input.selectionStart).toBe(0);
+  });
+
   it("should keep the original start and zone when editing", async () => {
     renderForm({
       message: "Launch",

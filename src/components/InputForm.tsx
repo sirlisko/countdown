@@ -19,7 +19,6 @@ import { Countdown } from "@/types";
 import { createQueryString } from "@/utils/queryString";
 import { getBrowserTimeZone } from "@/utils/timezone";
 import { Checkbox } from "./ui/checkbox";
-import { DialogClose } from "./ui/dialog";
 import { Label } from "./ui/label";
 
 const filters = [
@@ -78,12 +77,19 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
     );
   }
 
-  function onCopy() {
+  async function onCopy() {
     if (!link) return;
-    navigator.clipboard.writeText(link);
-    toast({
-      description: "Countdown copied to clipboard",
-    });
+    try {
+      await navigator.clipboard.writeText(link);
+      toast({ description: "Link copied" });
+    } catch {
+      document.querySelector<HTMLInputElement>("#link")?.select();
+      toast({
+        variant: "destructive",
+        description:
+          "Couldn't copy automatically. The link is selected, copy it from there.",
+      });
+    }
   }
 
   function onShare() {
@@ -294,12 +300,10 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
                 <Share1Icon className="size-4" />
               </Button>
             )}
-            <DialogClose asChild>
-              <Button type="button" size="icon" onClick={onCopy}>
-                <span className="sr-only">Copy</span>
-                <CopyIcon className="size-4" />
-              </Button>
-            </DialogClose>
+            <Button type="button" size="icon" onClick={onCopy}>
+              <span className="sr-only">Copy</span>
+              <CopyIcon className="size-4" />
+            </Button>
             <Button size="icon" asChild>
               <a href={link} target="_blank" rel="noopener noreferrer">
                 <span className="sr-only">Open</span>
