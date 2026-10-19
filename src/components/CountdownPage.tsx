@@ -10,7 +10,9 @@ import {
   nextYearly,
   normaliseDateOrder,
 } from "@/utils/date";
+import { setPhaseFavicon } from "@/utils/favicon";
 import { readCountdown } from "@/utils/location";
+import { clearRecent, readRecent, rememberCountdown } from "@/utils/recent";
 import { wallClockIn } from "@/utils/timezone";
 import Countdown from "./Counter/Countdown";
 import type { DialogState } from "./DialogNew";
@@ -38,6 +40,19 @@ const CountdownPage = () => {
   );
 
   const isValid = isValidDate(then);
+
+  const [recent, setRecent] = useState(readRecent);
+  const forgetRecent = useCallback(() => setRecent(clearRecent()), []);
+  useEffect(() => {
+    if (!isValid || isSample) return;
+    setRecent(
+      rememberCountdown({
+        href: window.location.href,
+        message,
+        then: then.toISOString(),
+      }),
+    );
+  }, [isValid, isSample, message, then]);
   const repeat =
     isValid && yearly ? nextYearly(then, now, timeZone) : undefined;
   const target = repeat?.next ?? then;
@@ -55,7 +70,9 @@ const CountdownPage = () => {
   }, [isValid, now, target]);
 
   useEffect(() => {
-    document.documentElement.dataset.phase = isPast ? "past" : "future";
+    const phase = isPast ? "past" : "future";
+    document.documentElement.dataset.phase = phase;
+    setPhaseFavicon(phase);
   }, [isPast]);
 
   const { from, to, isInverted } = normaliseDateOrder(now, target);
@@ -69,7 +86,7 @@ const CountdownPage = () => {
 
   const defaultValues = useMemo<CountdownType | undefined>(
     () =>
-      isValid
+      isValid && !isSample
         ? {
             message,
             ...(timeZone
@@ -87,7 +104,17 @@ const CountdownPage = () => {
             yearly,
           }
         : undefined,
-    [countdown, isValid, message, then, created, timeZone, yearly, filters],
+    [
+      countdown,
+      isValid,
+      isSample,
+      message,
+      then,
+      created,
+      timeZone,
+      yearly,
+      filters,
+    ],
   );
 
   const calendarEvent = useMemo(
@@ -117,6 +144,8 @@ const CountdownPage = () => {
           dialog={dialog}
           onDialogChange={setDialog}
           onFullscreen={toggleFullscreen}
+          recent={recent.filter(({ href }) => href !== window.location.href)}
+          onClearRecent={forgetRecent}
         />
       )}
       <main className="flex flex-1 flex-col justify-between gap-12 px-4 py-8 sm:px-8 sm:py-12">
@@ -143,7 +172,7 @@ const CountdownPage = () => {
             />
           </>
         ) : (
-          <InvalidLink />
+          <InvalidLink onCreate={createCountdown} />
         )}
       </main>
       {!isFullscreen && <Footer />}

@@ -22,7 +22,7 @@ const Footer = () => (
     )}
     <a
       className={link}
-      href="https://github.com/sirLisko/countdown"
+      href="https://github.com/sirlisko/countdown"
       target="_blank"
       rel="noopener noreferrer"
     >

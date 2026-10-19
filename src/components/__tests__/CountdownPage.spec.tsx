@@ -33,10 +33,14 @@ describe("CountdownPage", () => {
   });
 
   it("should count up from a past one-off date", () => {
+    const icon = document.head.appendChild(document.createElement("link"));
+    icon.rel = "icon";
     visit("/?m=Moon&t=1969-07-20T20%3A17%3A00.000Z&z=UTC");
     render(<CountdownPage />);
     expect(screen.getByText("T-plus")).toBeInTheDocument();
     expect(document.documentElement.dataset.phase).toBe("past");
+    expect(decodeURIComponent(icon.href)).toContain("#ff4d00");
+    icon.remove();
     expect(
       screen.queryByRole("button", { name: "Add to calendar" }),
     ).not.toBeInTheDocument();
@@ -46,6 +50,9 @@ describe("CountdownPage", () => {
     visit("/");
     render(<CountdownPage />);
     expect(screen.getByText("Example")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Edit" }),
+    ).not.toBeInTheDocument();
     await userEvent.click(
       screen.getByRole("button", { name: "Make your own →" }),
     );

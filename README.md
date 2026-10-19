@@ -35,6 +35,10 @@ pnpm install
 pnpm start
 ```
 
+## Analytics
+
+Production builds load [Umami](https://umami.is/) when `VITE_UMAMI_WEBSITE_ID` is set. Pageviews record which options a countdown uses but never their values: `/?m=Wedding&t=…&r=y` is sent as `/?m&r&t`, obfuscated links as `/hidden`, and the page title as `Countdown`.
+
 ## Run the tests
 
 ```bash
@@ -55,9 +59,9 @@ The first e2e run needs a browser: `pnpm exec playwright install chromium`.
 - UI Components [Shadcn/ui](https://ui.shadcn.com)
 - Hosted on [Netlify](https://netlify.com), with Edge Functions rendering link-preview (Open Graph) images
 
-It's possible to [check out the v1 of the project](https://github.com/sirLisko/countdown/tree/v0.1), running Create React App, Jest, Emotion and Babel Macros.
+It's possible to [check out the v1 of the project](https://github.com/sirlisko/countdown/tree/v0.1), running Create React App, Jest, Emotion and Babel Macros.
 
 [test-image]: https://github.com/sirlisko/countdown/workflows/Test%20CI/badge.svg
-[test-url]: https://github.com/sirLisko/countdown/actions
+[test-url]: https://github.com/sirlisko/countdown/actions
 [build-image]: https://api.netlify.com/api/v1/badges/fbe6d19d-38dd-4cac-ba31-a39bc9fa5a07/deploy-status
 [build-url]: https://app.netlify.com/sites/fancy-countdown/deploys

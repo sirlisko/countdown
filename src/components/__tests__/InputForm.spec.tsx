@@ -44,6 +44,22 @@ describe("InputForm", () => {
     expect(params.get("t")).toMatch(/Z$/);
   });
 
+  it("should fire in the picked time zone", async () => {
+    renderForm();
+    pickDate("2030-01-01");
+    await userEvent.selectOptions(
+      screen.getByLabelText("Time zone"),
+      "Asia/Tokyo",
+    );
+    await userEvent.click(
+      screen.getByRole("button", { name: "Generate link" }),
+    );
+
+    const params = link().searchParams;
+    expect(params.get("z")).toBe("Asia/Tokyo");
+    expect(params.get("t")).toBe("2029-12-31T15:00:00.000Z");
+  });
+
   it("should add the optional parts only when asked", async () => {
     renderForm();
     pickDate("2030-01-01");
@@ -86,6 +102,25 @@ describe("InputForm", () => {
     await waitFor(() =>
       expect(screen.queryByLabelText("Link")).not.toBeInTheDocument(),
     );
+  });
+
+  it("should select the link when the clipboard refuses it", async () => {
+    const writeText = vi.fn().mockRejectedValue(new Error("denied"));
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText },
+      configurable: true,
+    });
+    renderForm();
+    pickDate("2030-01-01");
+    await userEvent.click(
+      screen.getByRole("button", { name: "Generate link" }),
+    );
+    await userEvent.click(screen.getByRole("button", { name: "Copy" }));
+
+    const input = screen.getByLabelText<HTMLInputElement>("Link");
+    expect(writeText).toHaveBeenCalledWith(input.value);
+    await waitFor(() => expect(input.selectionEnd).toBe(input.value.length));
+    expect(input.selectionStart).toBe(0);
   });
 
   it("should keep the original start and zone when editing", async () => {

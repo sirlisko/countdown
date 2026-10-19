@@ -2,7 +2,7 @@ import type { Config, Context } from "@netlify/edge-functions";
 import { formatTarget, readSharedCountdown } from "../lib/countdown.ts";
 
 const DEFAULT_DESCRIPTION =
-  "Create customizable countdowns with ease. Track both future and past events with dynamic titles and flexible options.";
+  "Create a countdown (or count-up) to any moment and share it as a link. No account, nothing stored on a server.";
 
 const escapeHtml = (value: string) =>
   value.replace(
@@ -63,8 +63,7 @@ export const config: Config = {
     "/assets/*",
     "/og",
     "/og/*",
-    "/js/*",
-    "/api/*",
+    "/stats/*",
     "/favicon.svg",
     "/apple-touch-icon.png",
     "/icon-192.png",

@@ -18,8 +18,8 @@ import type { Countdown as CountdownType } from "@/types";
 import { Countdown } from "@/types";
 import { createQueryString } from "@/utils/queryString";
 import { getBrowserTimeZone } from "@/utils/timezone";
+import TimeZoneSelect from "./TimeZoneSelect";
 import { Checkbox } from "./ui/checkbox";
-import { DialogClose } from "./ui/dialog";
 import { Label } from "./ui/label";
 
 const filters = [
@@ -57,6 +57,7 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
     },
   });
   const { toast } = useToast();
+  const sameMoment = form.watch("sameMoment");
 
   useEffect(
     () =>
@@ -78,12 +79,19 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
     );
   }
 
-  function onCopy() {
+  async function onCopy() {
     if (!link) return;
-    navigator.clipboard.writeText(link);
-    toast({
-      description: "Countdown copied to clipboard",
-    });
+    try {
+      await navigator.clipboard.writeText(link);
+      toast({ description: "Link copied" });
+    } catch {
+      document.querySelector<HTMLInputElement>("#link")?.select();
+      toast({
+        variant: "destructive",
+        description:
+          "Couldn't copy automatically. The link is selected, copy it from there.",
+      });
+    }
   }
 
   function onShare() {
@@ -163,15 +171,30 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
                 <FormLabel>Same moment everywhere</FormLabel>
                 <FormDescription>
                   {field.value
-                    ? `Everyone hits zero together, at this time in ${(
-                        form.getValues("timeZone") ?? getBrowserTimeZone()
-                      ).replace(/_/g, " ")}.`
+                    ? "Everyone hits zero together, at this time in the zone below."
                     : "Hits zero at this local time wherever each viewer is, like New Year's Eve."}
                 </FormDescription>
               </div>
             </FormItem>
           )}
         />
+        {sameMoment && (
+          <FormField
+            control={form.control}
+            name="timeZone"
+            render={({ field }) => (
+              <FormItem className="pl-7">
+                <FormLabel>Time zone</FormLabel>
+                <FormControl>
+                  <TimeZoneSelect
+                    {...field}
+                    value={field.value ?? getBrowserTimeZone()}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        )}
         <FormField
           control={form.control}
           name="yearly"
@@ -294,12 +317,10 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
                 <Share1Icon className="size-4" />
               </Button>
             )}
-            <DialogClose asChild>
-              <Button type="button" size="icon" onClick={onCopy}>
-                <span className="sr-only">Copy</span>
-                <CopyIcon className="size-4" />
-              </Button>
-            </DialogClose>
+            <Button type="button" size="icon" onClick={onCopy}>
+              <span className="sr-only">Copy</span>
+              <CopyIcon className="size-4" />
+            </Button>
             <Button size="icon" asChild>
               <a href={link} target="_blank" rel="noopener noreferrer">
                 <span className="sr-only">Open</span>

@@ -4,9 +4,11 @@ import { Button } from "@/components/ui/button";
 import { isFullscreenSupported } from "@/hooks/use-fullscreen";
 import type { Countdown } from "@/types";
 import type { CalendarEvent } from "@/utils/calendar";
+import type { RecentCountdown } from "@/utils/recent";
 import CalendarMenu from "./CalendarMenu";
 import DialogNew, { type DialogState } from "./DialogNew";
 import { ModeToggle } from "./mode-toggler";
+import RecentMenu from "./RecentMenu";
 
 const cell = "h-full border-l-2 border-foreground px-3 sm:px-4";
 
@@ -17,6 +19,8 @@ const Header = ({
   dialog,
   onDialogChange,
   onFullscreen,
+  recent,
+  onClearRecent,
 }: {
   isPast?: boolean;
   defaultValues?: Countdown;
@@ -24,6 +28,8 @@ const Header = ({
   dialog: DialogState;
   onDialogChange: (state: DialogState) => void;
   onFullscreen: () => void;
+  recent: RecentCountdown[];
+  onClearRecent: () => void;
 }) => (
   <header className="flex h-14 items-stretch border-b-2 border-foreground font-mono text-xs uppercase tracking-widest">
     <a
@@ -48,6 +54,9 @@ const Header = ({
         state={dialog}
         onStateChange={onDialogChange}
       />
+      {recent.length > 0 && (
+        <RecentMenu recent={recent} onClear={onClearRecent} className={cell} />
+      )}
       {calendarEvent && <CalendarMenu event={calendarEvent} className={cell} />}
       {isFullscreenSupported && (
         <Button
