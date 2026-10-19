@@ -7,6 +7,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0a0a0a" />
     <link rel="manifest" href="/manifest.json" />
+    <!-- Mirrors ThemeProvider before React mounts, so dark mode doesn't flash light -->
+    <script>
+      try {
+        const stored = localStorage.getItem("vite-ui-theme");
+        const dark =
+          stored === "dark" ||
+          (stored !== "light" &&
+            matchMedia("(prefers-color-scheme: dark)").matches);
+        document.documentElement.classList.add(dark ? "dark" : "light");
+        document
+          .querySelector('meta[name="theme-color"]')
+          .setAttribute("content", dark ? "#0a0a0a" : "#efeee9");
+      } catch {}
+    </script>
     <title>Countdown by sirlisko</title>
     <meta
       name="description"
