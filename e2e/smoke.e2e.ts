@@ -5,7 +5,7 @@ test("create, open and edit a countdown", async ({ page }) => {
   await page.getByRole("button", { name: "New" }).click();
   await page.getByLabel("Message").fill("Ship v2");
   await page.getByLabel("Date").fill("2030-06-01");
-  await page.getByLabel("Time").fill("18:30");
+  await page.getByLabel("Time", { exact: true }).fill("18:30");
   await page.getByLabel("Progress bar").click();
   await page.getByRole("button", { name: "Generate link" }).click();
 
@@ -21,7 +21,7 @@ test("create, open and edit a countdown", async ({ page }) => {
   await page.getByRole("button", { name: "Edit" }).click();
   await expect(page.getByLabel("Message")).toHaveValue("Ship v2");
   await expect(page.getByLabel("Date")).toHaveValue("2030-06-01");
-  await expect(page.getByLabel("Time")).toHaveValue("18:30");
+  await expect(page.getByLabel("Time", { exact: true })).toHaveValue("18:30");
   await expect(page.getByLabel("Progress bar")).toBeChecked();
 });
 

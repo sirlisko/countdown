@@ -44,6 +44,22 @@ describe("InputForm", () => {
     expect(params.get("t")).toMatch(/Z$/);
   });
 
+  it("should fire in the picked time zone", async () => {
+    renderForm();
+    pickDate("2030-01-01");
+    await userEvent.selectOptions(
+      screen.getByLabelText("Time zone"),
+      "Asia/Tokyo",
+    );
+    await userEvent.click(
+      screen.getByRole("button", { name: "Generate link" }),
+    );
+
+    const params = link().searchParams;
+    expect(params.get("z")).toBe("Asia/Tokyo");
+    expect(params.get("t")).toBe("2029-12-31T15:00:00.000Z");
+  });
+
   it("should add the optional parts only when asked", async () => {
     renderForm();
     pickDate("2030-01-01");

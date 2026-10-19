@@ -18,6 +18,7 @@ import type { Countdown as CountdownType } from "@/types";
 import { Countdown } from "@/types";
 import { createQueryString } from "@/utils/queryString";
 import { getBrowserTimeZone } from "@/utils/timezone";
+import TimeZoneSelect from "./TimeZoneSelect";
 import { Checkbox } from "./ui/checkbox";
 import { Label } from "./ui/label";
 
@@ -56,6 +57,7 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
     },
   });
   const { toast } = useToast();
+  const sameMoment = form.watch("sameMoment");
 
   useEffect(
     () =>
@@ -169,15 +171,30 @@ const InputForm = ({ defaultValues }: { defaultValues?: Countdown }) => {
                 <FormLabel>Same moment everywhere</FormLabel>
                 <FormDescription>
                   {field.value
-                    ? `Everyone hits zero together, at this time in ${(
-                        form.getValues("timeZone") ?? getBrowserTimeZone()
-                      ).replace(/_/g, " ")}.`
+                    ? "Everyone hits zero together, at this time in the zone below."
                     : "Hits zero at this local time wherever each viewer is, like New Year's Eve."}
                 </FormDescription>
               </div>
             </FormItem>
           )}
         />
+        {sameMoment && (
+          <FormField
+            control={form.control}
+            name="timeZone"
+            render={({ field }) => (
+              <FormItem className="pl-7">
+                <FormLabel>Time zone</FormLabel>
+                <FormControl>
+                  <TimeZoneSelect
+                    {...field}
+                    value={field.value ?? getBrowserTimeZone()}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        )}
         <FormField
           control={form.control}
           name="yearly"
