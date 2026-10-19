@@ -10,6 +10,7 @@ import {
   nextYearly,
   normaliseDateOrder,
 } from "@/utils/date";
+import { setPhaseFavicon } from "@/utils/favicon";
 import { readCountdown } from "@/utils/location";
 import { clearRecent, readRecent, rememberCountdown } from "@/utils/recent";
 import { wallClockIn } from "@/utils/timezone";
@@ -69,7 +70,9 @@ const CountdownPage = () => {
   }, [isValid, now, target]);
 
   useEffect(() => {
-    document.documentElement.dataset.phase = isPast ? "past" : "future";
+    const phase = isPast ? "past" : "future";
+    document.documentElement.dataset.phase = phase;
+    setPhaseFavicon(phase);
   }, [isPast]);
 
   const { from, to, isInverted } = normaliseDateOrder(now, target);
