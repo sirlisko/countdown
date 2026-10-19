@@ -69,7 +69,7 @@ const CountdownPage = () => {
 
   const defaultValues = useMemo<CountdownType | undefined>(
     () =>
-      isValid
+      isValid && !isSample
         ? {
             message,
             ...(timeZone
@@ -87,7 +87,17 @@ const CountdownPage = () => {
             yearly,
           }
         : undefined,
-    [countdown, isValid, message, then, created, timeZone, yearly, filters],
+    [
+      countdown,
+      isValid,
+      isSample,
+      message,
+      then,
+      created,
+      timeZone,
+      yearly,
+      filters,
+    ],
   );
 
   const calendarEvent = useMemo(

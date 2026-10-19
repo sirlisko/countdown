@@ -46,6 +46,9 @@ describe("CountdownPage", () => {
     visit("/");
     render(<CountdownPage />);
     expect(screen.getByText("Example")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Edit" }),
+    ).not.toBeInTheDocument();
     await userEvent.click(
       screen.getByRole("button", { name: "Make your own →" }),
     );
