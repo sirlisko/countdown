@@ -63,8 +63,6 @@ export const config: Config = {
     "/assets/*",
     "/og",
     "/og/*",
-    "/js/*",
-    "/api/*",
     "/favicon.svg",
     "/apple-touch-icon.png",
     "/icon-192.png",
