@@ -11,6 +11,7 @@ import {
   normaliseDateOrder,
 } from "@/utils/date";
 import { readCountdown } from "@/utils/location";
+import { clearRecent, readRecent, rememberCountdown } from "@/utils/recent";
 import { wallClockIn } from "@/utils/timezone";
 import Countdown from "./Counter/Countdown";
 import type { DialogState } from "./DialogNew";
@@ -38,6 +39,19 @@ const CountdownPage = () => {
   );
 
   const isValid = isValidDate(then);
+
+  const [recent, setRecent] = useState(readRecent);
+  const forgetRecent = useCallback(() => setRecent(clearRecent()), []);
+  useEffect(() => {
+    if (!isValid || isSample) return;
+    setRecent(
+      rememberCountdown({
+        href: window.location.href,
+        message,
+        then: then.toISOString(),
+      }),
+    );
+  }, [isValid, isSample, message, then]);
   const repeat =
     isValid && yearly ? nextYearly(then, now, timeZone) : undefined;
   const target = repeat?.next ?? then;
@@ -127,6 +141,8 @@ const CountdownPage = () => {
           dialog={dialog}
           onDialogChange={setDialog}
           onFullscreen={toggleFullscreen}
+          recent={recent.filter(({ href }) => href !== window.location.href)}
+          onClearRecent={forgetRecent}
         />
       )}
       <main className="flex flex-1 flex-col justify-between gap-12 px-4 py-8 sm:px-8 sm:py-12">
