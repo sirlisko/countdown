@@ -1,1 +1,6 @@
+# First-party paths so blockers leave analytics alone; the script posts to
+# /api/send next to wherever it was loaded from
+/stats/script.js https://stats.sirlisko.com/script.js 200
+/stats/api/send https://stats.sirlisko.com/api/send 200
+
 /*  /index.html 200

@@ -21,7 +21,7 @@ const umami = (websiteId?: string): Plugin => ({
             tag: "script",
             attrs: {
               defer: true,
-              src: "https://stats.sirlisko.com/script.js",
+              src: "/stats/script.js",
               "data-website-id": websiteId,
               "data-exclude-search": "true",
               "data-before-send": "umamiBeforeSend",
