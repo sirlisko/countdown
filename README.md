@@ -37,7 +37,7 @@ pnpm start
 
 ## Analytics
 
-Production builds load [Umami](https://umami.is/) when `VITE_UMAMI_WEBSITE_ID` is set. Pageviews never include the countdown itself: the query string is dropped and obfuscated links are recorded as `/hidden`.
+Production builds load [Umami](https://umami.is/) when `VITE_UMAMI_WEBSITE_ID` is set. Pageviews record which options a countdown uses but never their values: `/?m=Wedding&t=…&r=y` is sent as `/?m&r&t`, obfuscated links as `/hidden`, and the page title as `Countdown`.
 
 ## Run the tests
 
